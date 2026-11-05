@@ -1,0 +1,28 @@
+appId: co.canted.afire.preview.localhttps
+---
+# iPhone 16 Pro fixture: synthetic icon is the first visible photo.
+- assertVisible: Photos
+- tapOn:
+    point: 16%, 28%
+- extendedWaitUntil:
+    visible: Insert attachment
+    timeout: 20000
+- tapOn: Insert attachment
+- extendedWaitUntil:
+    notVisible: Remove attachment
+    timeout: 30000
+- scrollUntilVisible:
+    element: Publish Round contribution
+    direction: DOWN
+- tapOn: Publish Round contribution
+- extendedWaitUntil:
+    visible: Your cover is in
+    timeout: 30000
+- assertVisible: Replace cover
+- takeScreenshot: published-cover
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Your cover is in
+    timeout: 30000
+- takeScreenshot: persisted-cover

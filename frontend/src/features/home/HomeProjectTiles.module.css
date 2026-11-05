@@ -1,0 +1,88 @@
+@import "../../styles/tokens.css";
+.frame {
+  container-type: inline-size;
+  padding: 4px;
+  border-radius: 20px;
+  background: var(--color-paper);
+}
+.tiles {
+  /* Set the gap on the grid: its own declaration overrides inherited values. */
+  --media-gap: 4px;
+  border-radius: 16px;
+}
+.tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  min-width: 0;
+  min-height: 0;
+}
+.media {
+  height: 100%;
+  pointer-events: none;
+}
+.media button,
+.media video {
+  pointer-events: auto;
+}
+.writing {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 4px;
+  overflow: hidden;
+  font:
+    500 12px/1.4 Lato,
+    sans-serif;
+  color: var(--color-black);
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}
+.tile:first-child .writing {
+  padding: 8px;
+  font-size: 14px;
+}
+.identity {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  line-height: 0;
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  pointer-events: none;
+}
+.calendar {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  height: 100%;
+  pointer-events: none;
+}
+.calendar span {
+  border-radius: 2px;
+}
+.tile:has(:focus-visible) {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+}
+
+/* Reply treatments retain the mosaic's 4px internal and 16px external corners. */
+.reply { display: flex; flex-direction: column; box-sizing: border-box; --reply-inset: 4px; }
+.reply:first-child { --reply-inset: 8px; }
+.replyAuthor { display: flex; align-items: center; gap: 4px; padding: var(--reply-inset); min-width: 0; pointer-events: none; background: var(--color-paper); flex-shrink: 0; }
+.replyAuthor > :nth-child(2) { flex: 1; min-width: 0; }
+.tile.reply .writing { flex: 1; min-height: 0; height: auto; padding: var(--reply-inset); font-size: 12px; }
+.reply .media { flex: 1; min-height: 0; height: auto; overflow: hidden; }
+.outlined { border: 1px solid var(--color-border); }
+.outlined .replyAuthor { border-bottom: 1px solid var(--color-border); }
+.inset { border: 6px solid var(--color-surface); background: var(--color-paper) !important; }
+.inset .replyAuthor { padding-bottom: 2px; }
+.ribbon.textReply .replyAuthor { background: transparent; margin: var(--reply-inset) var(--reply-inset) 0; padding: 0; }
+.ribbon.mediaReply .replyAuthor { position: absolute; z-index: 1; top: 4px; left: 4px; right: 4px; border-radius: 999px; padding: 2px 4px; }
+.writing > span { display: block; height: 100%; overflow: hidden; }
+
+.tile.reply.ribbon .writing { font-size: 14px; }

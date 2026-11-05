@@ -1,0 +1,22 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: Message Expo rich content.*
+    timeout: 15000
+- tapOn: Message Expo rich content.*
+- inputText: Unsent native composition draft
+- tapOn: Back to home
+- openLink: ${OTHER_ROOM_LINK}
+- extendedWaitUntil:
+    visible: Message Expo performance 70.*
+    timeout: 15000
+- assertNotVisible: Unsent native composition draft.*
+- tapOn: Back to home
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: Unsent native composition draft.*
+    timeout: 15000
+- takeScreenshot: restored-composer-draft
+- tapOn: Unsent native composition draft.*
+- eraseText: 40

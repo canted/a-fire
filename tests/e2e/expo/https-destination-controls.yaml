@@ -1,0 +1,28 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}?view=manage
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- scrollUntilVisible:
+    element: Remove cover by web benchmark
+    direction: DOWN
+- tapOn: Remove cover by web benchmark
+- assertVisible: Note about the removal.*Optional
+- assertVisible: Send notification
+- assertVisible: Confirm remove cover
+- takeScreenshot: optional-cover-removal
+- tapOn: Cancel removal
+- scrollUntilVisible:
+    element: Edit Round
+    direction: DOWN
+- tapOn: Edit Round
+- extendedWaitUntil:
+    visible: Submission deadline
+    timeout: 30000
+- assertVisible: Save Round
+- assertVisible: Cancel
+- takeScreenshot: round-date-controls
+- tapOn: Submission deadline
+- takeScreenshot: round-native-date-picker

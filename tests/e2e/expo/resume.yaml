@@ -1,0 +1,13 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: ${MESSAGE}
+    timeout: 15000
+- takeScreenshot: foreground-recovery
+- tapOn: "Back to home"
+- extendedWaitUntil:
+    visible: "Rooms"
+    timeout: 10000
+- takeScreenshot: unread-after-reading

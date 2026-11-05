@@ -1,0 +1,9 @@
+/* Apply the shared 12px/safe-area edge once. Centering and width stay separate;
+   cards and media inside this boundary own their own internal spacing. */
+.content {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--app-layout-max-width);
+  margin-inline: auto;
+  padding-inline: var(--app-page-inset-start) var(--app-page-inset-end);
+}

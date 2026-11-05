@@ -1,0 +1,32 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Your response is in
+    timeout: 30000
+- assertVisible: Synthetic response to the chosen cover.
+- assertVisible: Replace response
+- assertNotVisible: Complete Round
+- takeScreenshot: participant-response
+- tapOn: Manage Round
+- extendedWaitUntil:
+    visible: View Round
+    timeout: 10000
+- scrollUntilVisible:
+    element: Edit Round
+    direction: DOWN
+    centerElement: false
+- assertVisible: Complete Round
+- takeScreenshot: host-management
+- scrollUntilVisible:
+    element: View Round
+    direction: UP
+    centerElement: true
+- tapOn: View Round
+- assertVisible: Your response is in
+- tapOn: Replace response
+- assertVisible: Create a new entry
+- assertNotVisible: Complete Round
+- tapOn: Cancel contribution
+- assertVisible: Your response is in

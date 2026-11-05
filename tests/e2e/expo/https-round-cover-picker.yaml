@@ -1,0 +1,16 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Pin up an image
+    timeout: 30000
+- tapOn: Pin up an image
+- tapOn: Create a new entry
+- extendedWaitUntil:
+    visible: Choose photo
+    timeout: 20000
+- assertNotVisible: Record audio
+- assertNotVisible: Entry title.*
+- tapOn: Choose photo
+- takeScreenshot: cover-photo-picker

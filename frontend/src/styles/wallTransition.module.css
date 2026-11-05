@@ -1,0 +1,47 @@
+:global(:root) { --room-wall-snapshot: room-wall; --room-side-snapshot: room-side-control; }
+[data-wall-control="fab"], [data-wall-snapshot="panel"] { view-transition-name: var(--room-wall-snapshot); }
+[data-wall-control="side"] { view-transition-name: var(--room-side-snapshot); }
+[data-wall-control="side"][data-wall-open] { view-transition-name: none; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { [data-wall-control], [data-wall-snapshot] { view-transition-name: none; } }
+:global(::view-transition-group(room-wall)) { z-index: 20; animation-duration: 320ms; animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1); }
+
+
+/* Keep the morph's measured endpoints at rest. Only its launcher snapshot
+   departs/returns; there is no second captured FAB or glyph. */
+[data-wall-control="fab"] { transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s; }
+[data-wall-control="fab"][data-wall-open] { transform: translateX(100vw); visibility: hidden; pointer-events: none; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s 180ms; }
+:global(html[data-room-wall-transition]) [data-wall-control="fab"] { transition: none; }
+:global(html[data-room-wall-transition="opening"]::view-transition-old(room-wall)),
+:global(html[data-room-wall-transition="closing"]::view-transition-new(room-wall)) {
+  width: 2.75rem;
+  height: 2.75rem;
+  object-fit: contain;
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+:global(html[data-room-wall-transition="opening"]::view-transition-old(room-wall)) { animation: wall-launcher-out 180ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+:global(html[data-room-wall-transition="closing"]::view-transition-new(room-wall)) { animation: wall-launcher-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes wall-launcher-out { to { transform: translateX(100vw); } }
+@keyframes wall-launcher-in { from { transform: translateX(100vw); } to { transform: translateX(0); } }
+@media (prefers-reduced-motion: reduce) { [data-wall-control="fab"] { transition: none; } }
+
+/* Counter the group's existing FLIP translation while the launcher snapshot
+   travels horizontally. The Wall keeps its original resize/morph trajectory. */
+@supports (animation-composition: add) {
+  :global(html[data-room-wall-transition="opening"]::view-transition-old(room-wall)) {
+    animation: wall-launcher-out 180ms cubic-bezier(0.16, 1, 0.3, 1) both, wall-launcher-origin-out 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-composition: add;
+  }
+  :global(html[data-room-wall-transition="closing"]::view-transition-new(room-wall)) {
+    animation: wall-launcher-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both, wall-launcher-origin-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-composition: add;
+  }
+}
+@keyframes wall-launcher-origin-out { from { transform: translate(0, 0); } to { transform: translate(var(--room-wall-launcher-x, 0px), var(--room-wall-launcher-y, 0px)); } }
+@keyframes wall-launcher-origin-in { from { transform: translate(var(--room-wall-launcher-x, 0px), var(--room-wall-launcher-y, 0px)); } to { transform: translate(0, 0); } }
+
+:global(::view-transition-group(room-side-control)) { z-index: 21; }
+:global(html[data-room-wall-transition="opening"]::view-transition-old(room-side-control)) { animation: side-control-out 180ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+:global(html[data-room-wall-transition="closing"]::view-transition-new(room-side-control)) { animation: side-control-in 240ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes side-control-out { to { transform: translateX(100vw); } }
+@keyframes side-control-in { from { transform: translateX(100vw); } to { transform: translateX(0); } }

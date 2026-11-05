@@ -1,0 +1,32 @@
+# Supply EDIT_TEXT (prefer one character on Android), NOTE_BODY and EXPECTED_BODY.
+# Use (?s) in body regexes: native accessibility text can contain line breaks.
+# Arm one PUT /api/v2/notes/${NOTE_ID}/content reject-before fault before running.
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible: More tools
+    timeout: 30000
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - tapOn: Note and entry text
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - tapOn: ${NOTE_BODY}
+- inputText: ${EDIT_TEXT}
+- runFlow:
+    when:
+      platform: iOS
+      visible: Done
+    commands:
+      - tapOn: Done
+- extendedWaitUntil:
+    visible: 'Synthetic connection interruption. Retry this message.'
+    timeout: 15000
+- assertVisible: ${EXPECTED_BODY}
+- takeScreenshot: failed-note-draft

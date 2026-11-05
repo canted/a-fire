@@ -1,0 +1,15 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}/edit
+- extendedWaitUntil:
+    visible: Only hosts can edit an open Round.
+    timeout: 30000
+- assertNotVisible: Save Round
+- takeScreenshot: non-host-edit-denied
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- takeScreenshot: member-round-visible

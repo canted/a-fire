@@ -1,0 +1,36 @@
+import { afterEach, expect, it, vi } from 'vitest';
+import type { Root } from 'react-dom/client';
+const state = vi.hoisted(() => ({ path: '/app/rooms/2899/new-entry', params: { sourceRequest: 'c9e9abd3-bb17-4566-8499-863638bf3a0c', sourceProject: '347', sourceEntry: '5958' } as Record<string, string>, stored: {} as unknown, changed: (_reset: boolean) => {}, disconnect: vi.fn() }));
+vi.mock('../../../../frontend/node_modules/expo-router', () => ({ usePathname: () => state.path, useGlobalSearchParams: () => state.params }));
+vi.mock('../../../../frontend/node_modules/react-native', () => ({ AppState: { currentState: 'active', addEventListener: () => ({ remove() {} }) } }));
+vi.mock('../../../../frontend/src/lib/api', () => ({ client: {}, onSessionChange: (callback: typeof state.changed) => { state.changed = callback; return () => {}; } }));
+vi.mock('../../../../frontend/src/lib/sessionStorage', () => ({ sessionStorage: { read: async () => state.stored } }));
+vi.mock('../../../../frontend/src/lib/cable', () => ({ cable: { disconnect: state.disconnect } }));
+Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
+const expo = '../../../../frontend';
+const { act, createElement } = await import(`${expo}/node_modules/react/index.js`) as typeof import('react');
+const { createRoot } = await import(`${expo}/node_modules/react-dom/client.js`) as typeof import('react-dom/client');
+const { useSWRConfig } = await import(`${expo}/node_modules/swr/dist/index/index.mjs`);
+const { SessionProvider, useSession } = await import(`${expo}/src/hooks/useSession.tsx`);
+let root: Root | undefined;
+afterEach(async () => { if (root) await act(async () => root!.unmount()); root = undefined; });
+it('captures the private draft before resetting navigation and clears its private cache', async () => {
+  let session!: ReturnType<typeof useSession>;
+  let cache!: Map<string, unknown>;
+  function Probe() { session = useSession(); cache = useSWRConfig().cache as Map<string, unknown>; return null; }
+  root = createRoot(document.createElement('div'));
+  const render = () => root!.render(createElement(SessionProvider, null, createElement(Probe)));
+  await act(async () => render());
+  const oldScope = session.draftScope;
+  cache.set('private-entry', { data: 'private body' });
+  await act(async () => { state.stored = null; state.changed(true); state.path = '/app'; state.params = {}; render(); });
+  expect(session.signedIn).toBe(false);
+  expect(session.returnTo).toBe('/app/rooms/2899/new-entry?sourceRequest=c9e9abd3-bb17-4566-8499-863638bf3a0c&sourceProject=347&sourceEntry=5958');
+  expect(session.draftScope).not.toBe(oldScope);
+  expect(cache.has('private-entry')).toBe(false);
+  expect(state.disconnect).toHaveBeenCalledOnce();
+  const scope = session.draftScope;
+  await act(async () => { state.stored = {}; state.changed(false); });
+  expect(session.draftScope).toBe(scope);
+  expect(state.disconnect).toHaveBeenCalledOnce();
+});

@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "A Fire",
+    "slug": "afire",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./public/icons/icon-1024.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "co.canted.afire.preview"
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false,
+      "package": "co.canted.afire.preview"
+    },
+    "web": {
+      "favicon": "./public/icons/icon-192.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "scheme": "afire-preview",
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      "expo-secure-store",
+      "expo-font",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Allow A Fire to record audio for your message.",
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      [
+        "expo-video",
+        {
+          "supportsBackgroundPlayback": false,
+          "supportsPictureInPicture": false
+        }
+      ],
+      "expo-sharing",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow A Fire to attach a photo to your message.",
+          "cameraPermission": "Allow A Fire to take a photo for your message."
+        }
+      ],
+      "expo-document-picker"
+    ]
+  }
+}

@@ -1,0 +1,88 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Fresh draft fixture; no production data or external reminders.
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- tapOn: Edit Round
+- extendedWaitUntil:
+    visible: Round name.*
+    timeout: 15000
+- takeScreenshot: editable-draft-round
+- tapOn: Back
+- scrollUntilVisible:
+    element: Start Round
+    direction: DOWN
+- tapOn: Start Round
+- scrollUntilVisible:
+    element: Join the round
+    direction: UP
+- tapOn: Join the round
+- extendedWaitUntil:
+    visible: Withdraw participation
+    timeout: 15000
+- tapOn: Withdraw participation
+- extendedWaitUntil:
+    visible: Join the round
+    timeout: 15000
+- tapOn: Follow round
+- extendedWaitUntil:
+    visible: Withdraw participation
+    timeout: 15000
+- tapOn: Withdraw participation
+- tapOn: Join as reviewer
+- extendedWaitUntil:
+    visible: Withdraw participation
+    timeout: 15000
+- takeScreenshot: reviewer-participation
+- tapOn: Withdraw participation
+- scrollUntilVisible:
+    element: Edit Round
+    direction: DOWN
+- tapOn: Edit Round
+- extendedWaitUntil:
+    visible: Round invitation.*
+    timeout: 15000
+# Native date controls reject invalid calendar input; roundDates.test.ts covers
+# overflow/DST validation. Preserve this lifecycle's save/reload assertions.
+- assertVisible: Submission deadline.*
+- assertVisible: Response deadline.*
+- tapOn: Save Round
+- extendedWaitUntil:
+    visible: Submissions.*
+    timeout: 15000
+- assertVisible: Responses.*
+- takeScreenshot: persisted-local-deadlines
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- scrollUntilVisible:
+    element: Complete Round
+    direction: DOWN
+- tapOn: Complete Round
+- scrollUntilVisible:
+    element: Keep Round open
+    direction: DOWN
+    centerElement: true
+- tapOn: Keep Round open
+- scrollUntilVisible:
+    element: Complete Round
+    direction: DOWN
+    centerElement: true
+- tapOn: Complete Round
+- scrollUntilVisible:
+    element: Confirm complete Round
+    direction: DOWN
+    centerElement: true
+- tapOn: Confirm complete Round
+- scrollUntilVisible:
+    element: complete.*archived
+    direction: UP
+    timeout: 15000
+- assertNotVisible: Join the round
+- assertNotVisible: Edit Round
+- takeScreenshot: archived-round

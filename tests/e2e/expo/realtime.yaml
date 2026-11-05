@@ -1,0 +1,8 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: ${MESSAGE}
+    timeout: 60000
+- takeScreenshot: room-realtime

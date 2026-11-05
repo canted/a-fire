@@ -1,0 +1,89 @@
+name: Source Verification
+
+on:
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  expo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - name: Install isolated Expo dependencies
+        working-directory: frontend
+        run: |
+          corepack enable
+          corepack install
+          pnpm install --frozen-lockfile
+      - name: Check canonical token projection
+        run: node bin/expo-tokens.mjs --check
+      - run: node bin/expo-assets.mjs --check
+      - name: Check Expo types and SDK versions
+        working-directory: frontend
+        run: |
+          pnpm typecheck
+          pnpm check:versions
+          pnpm peers check
+      # Native builds and runtime acceptance are deferred for the web milestone.
+      - name: Export Expo web
+        working-directory: frontend
+        env:
+          CI: '1'
+          # Bundle validation only; deployment supplies its own API endpoint.
+          EXPO_PUBLIC_API_URL: 'https://api.example.invalid/api'
+        run: pnpm build:web
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: afire
+          POSTGRES_PASSWORD: test-only
+          POSTGRES_DB: afire_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://afire:test-only@localhost:5432/afire_test
+      JWT_SECRET: ci-test-only
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - name: Enable the pinned package manager
+        run: |
+          corepack enable
+          corepack install
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Generate database client
+        run: pnpm prisma:generate
+      - name: Prepare the isolated test database
+        run: pnpm test:prepare
+      - name: Lint
+        run: pnpm lint
+      - name: TypeScript checks
+        run: pnpm typecheck
+      - name: Install Chromium for browser-backed persistence tests
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Tests
+        run: pnpm vitest
+      - name: Production build
+        env:
+          NODE_ENV: production
+        run: pnpm build

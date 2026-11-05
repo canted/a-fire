@@ -1,0 +1,10 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible:
+      text: More tools
+      enabled: true
+    timeout: 30000
+- assertVisible: ${NOTE_BODY}

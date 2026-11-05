@@ -1,0 +1,15 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Your response is in
+    timeout: 30000
+- scrollUntilVisible:
+    element: Play audio
+    direction: DOWN
+- tapOn: Play audio
+- assertVisible: Pause audio
+- tapOn: Pause audio
+- assertVisible: Play audio
+- takeScreenshot: published-round-audio-playback

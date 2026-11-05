@@ -1,0 +1,12 @@
+# Begin with an open synthetic Note, then revoke its Room membership before running.
+appId: co.canted.afire.preview.localhttps
+---
+- pressKey: home
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: This note is unavailable or you no longer have access.
+    timeout: 45000
+- assertNotVisible: ${NOTE_BODY}
+- assertNotVisible: Save note
+- takeScreenshot: protected-note-removed

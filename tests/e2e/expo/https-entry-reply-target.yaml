@@ -1,0 +1,25 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/entries/${POST_ID}?reply=${TARGET_ID}
+- extendedWaitUntil:
+    visible: 'Reply target 70: synthetic pagination and reveal check.'
+    timeout: 30000
+- extendedWaitUntil:
+    notVisible: Finding reply…
+    timeout: 15000
+- takeScreenshot: paginated-reply-target
+- openLink: afire-local-https://app/entries/${POST_ID}?reply=${FIRST_ID}
+- extendedWaitUntil:
+    visible: 'Reply target 1: synthetic pagination and reveal check.'
+    timeout: 30000
+- extendedWaitUntil:
+    notVisible: Finding reply…
+    timeout: 15000
+- takeScreenshot: warm-first-reply
+- openLink: afire-local-https://app/entries/${POST_ID}?reply=999999999
+- extendedWaitUntil:
+    visible: This reply is unavailable in your entry history.
+    timeout: 30000
+- assertVisible: 'Message this entry.*'
+- takeScreenshot: unavailable-reply

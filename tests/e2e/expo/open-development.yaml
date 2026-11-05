@@ -1,0 +1,12 @@
+appId: co.canted.afire.preview
+---
+- openLink: ${DEV_CLIENT_URL}
+- tapOn:
+    text: Open
+    optional: true
+- extendedWaitUntil:
+    visible: "Rooms|Message .*|Continue|Close"
+    timeout: 30000
+- tapOn:
+    text: Close
+    optional: true

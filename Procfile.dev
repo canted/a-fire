@@ -1,0 +1,3 @@
+web: pnpm dev:api
+worker: pnpm dev:worker
+vite: pnpm exec vite --host 0.0.0.0 --port 5173

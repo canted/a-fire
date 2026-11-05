@@ -1,0 +1,64 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    "types": [
+      "vite/client",
+      "vitest/globals",
+      "node"
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "./frontend/site/*"
+      ],
+      "@tiptap/*": [
+        "./node_modules/@tiptap/*"
+      ],
+      "@server/*": [
+        "./server/*"
+      ],
+      "@tests/*": [
+        "./tests/*"
+      ],
+      "react": [
+        "./frontend/node_modules/@types/react"
+      ],
+      "react/*": [
+        "./frontend/node_modules/@types/react/*"
+      ]
+    }
+  },
+  "include": [
+    "frontend/site",
+    "server",
+    "tests",
+    "types",
+    "vitest.setup.ts"
+  ],
+  "exclude": [
+    "frontend/src",
+    "frontend/node_modules",
+    "frontend/dist",
+    "frontend/ios",
+    "frontend/android"
+  ]
+}

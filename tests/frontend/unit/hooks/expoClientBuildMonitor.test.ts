@@ -1,0 +1,31 @@
+import { afterEach, expect, it, vi } from 'vitest';
+const state = vi.hoisted(() => ({ scope: {}, reload: vi.fn(), record: vi.fn(), active: false }));
+vi.mock('../../../../frontend/node_modules/react', () => ({ useState: () => [undefined, vi.fn()], useCallback: (callback: unknown) => callback, useEffect: (effect: () => void) => effect(), useSyncExternalStore: (_subscribe: unknown, snapshot: () => unknown) => snapshot() }));
+vi.mock('../../../../frontend/node_modules/react-native', () => ({ View: 'View', Text: 'Text', StyleSheet: { create: (value: unknown) => value } }));
+vi.mock('../../../../frontend/src/components/Button', () => ({ Button: 'Button' }));
+vi.mock('../../../../frontend/src/styles/layout', () => ({ layout: {} }));
+vi.mock('../../../../frontend/src/hooks/useClientBuildStatus.web', () => ({ useClientBuildStatus: () => ({ current: 'old', latest: 'new', available: true }) }));
+vi.mock('../../../../frontend/src/hooks/useSession', () => ({ useSession: () => ({ draftScope: state.scope }) }));
+vi.mock('../../../../frontend/src/lib/clientBuildReloadGuard', () => ({ reconcileClientBuildReloadAttempts: vi.fn(), recordClientBuildAutoReload: state.record }));
+import { scopedDrafts } from '../../../../frontend/src/lib/scopedDrafts';
+import { setClientBuildReloadBlocker, clearClientBuildReloadBlockers } from '../../../../frontend/src/lib/clientBuildReloadBlockers';
+const { ClientBuildMonitor } = await import('../../../../frontend/src/features/clientBuild/ClientBuildMonitor.web');
+afterEach(() => { state.scope = {}; clearClientBuildReloadBlockers(); vi.clearAllMocks(); vi.unstubAllGlobals(); });
+const updateButton = () => ClientBuildMonitor({ reloadPage: state.reload })!.props.children[1].props.children[0];
+it('offers a manual reload only while no work is pending', () => {
+  const button = updateButton();
+  expect(button.props.disabled).toBe(false);
+  button.props.onPress();
+  expect(state.reload).toHaveBeenCalledOnce();
+});
+it('blocks retained drafts and checks editor ownership again at activation', () => {
+  const button = updateButton();
+  setClientBuildReloadBlocker('recording', true);
+  button.props.onPress();
+  expect(state.reload).not.toHaveBeenCalled();
+  clearClientBuildReloadBlockers();
+  scopedDrafts(state.scope, () => '', value => Boolean(value)).write('closed-room', 'unsent');
+  expect(updateButton().props.disabled).toBe(true);
+  button.props.onPress();
+  expect(state.reload).not.toHaveBeenCalled();
+});

@@ -1,0 +1,41 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat
+- extendedWaitUntil:
+    visible: Add attachment
+    timeout: 20000
+- tapOn: Add attachment
+- assertVisible: Camera
+- assertVisible: Choose photo or file
+- takeScreenshot: attachment-icons
+- tapOn: Record audio
+- extendedWaitUntil:
+    visible: Recording [1-9][0-9]*s
+    timeout: 15000
+- tapOn: Stop recording
+- assertVisible: Review recording
+- assertNotVisible: Remove attachment
+- tapOn: Play recording
+- assertVisible: Pause recording
+- takeScreenshot: recording-review
+- tapOn: Record again
+- extendedWaitUntil:
+    visible: Recording [1-9][0-9]*s
+    timeout: 15000
+- tapOn: Stop recording
+- tapOn: Discard recording
+- assertVisible: Add attachment
+- assertNotVisible: Remove attachment
+- tapOn: Add attachment
+- tapOn: Record audio
+- extendedWaitUntil:
+    visible: Recording [1-9][0-9]*s
+    timeout: 15000
+- tapOn: Stop recording
+- tapOn: Use recording
+- assertVisible: Recording.m4a
+- assertVisible: Remove attachment
+- takeScreenshot: recording-attached
+- tapOn: Remove attachment
+- assertNotVisible: Recording.m4a

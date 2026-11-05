@@ -1,0 +1,104 @@
+#!/usr/bin/env node
+
+import { spawn } from "node:child_process";
+import dotenv from "dotenv";
+import { loadTestEnvironment } from "../server/runtime/test-environment.mjs";
+
+if (process.env.NODE_ENV === "test") loadTestEnvironment({ requireDatabase: true });
+else dotenv.config({ quiet: true });
+
+const webArgs = process.argv.slice(2);
+const webPort = process.env.WEB_PORT || "5173";
+const processes = [
+  ["api", ["dev:api"]],
+  ["worker", ["dev:worker"]],
+  ["web", ["--dir", "frontend", "exec", "node", "--dns-result-order=ipv4first", "node_modules/expo/bin/cli", "start", "--web", "--localhost", "--port", webPort, ...webArgs]],
+];
+
+const children = new Map();
+let shuttingDown = false;
+let requestedExitCode = 0;
+
+function runMigrations() {
+  return new Promise((resolve, reject) => {
+    const child = spawn(
+      "pnpm",
+      ["db:prepare"],
+      {
+        cwd: process.cwd(),
+        env: process.env,
+        stdio: "inherit",
+      },
+    );
+
+    child.on("error", reject);
+    child.on("exit", (code, signal) => {
+      if (signal) {
+        reject(new Error(`Database migration exited with signal ${signal}`));
+        return;
+      }
+      if (code !== 0) {
+        reject(new Error(`Database migration failed with exit code ${code ?? 1}`));
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+function stopAll(signal = "SIGTERM") {
+  if (shuttingDown) {
+    return;
+  }
+
+  shuttingDown = true;
+  for (const child of children.values()) {
+    if (!child.killed) {
+      child.kill(signal);
+    }
+  }
+}
+
+await runMigrations();
+
+for (const [name, args] of processes) {
+  const child = spawn("pnpm", args, {
+    cwd: process.cwd(),
+    env: name === "web" ? {
+      ...process.env,
+      // Metro is a development server even when the API uses the isolated test database.
+      NODE_ENV: process.env.NODE_ENV === "test" ? "development" : process.env.NODE_ENV,
+      ...(process.env.NODE_ENV === "test" ? { EXPO_NO_DOTENV: "1" } : {}),
+      EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL || `http://localhost:${process.env.API_PORT || "4000"}/api`,
+    } : process.env,
+    stdio: "inherit",
+  });
+
+  children.set(name, child);
+
+  child.on("exit", (code, signal) => {
+    children.delete(name);
+
+    if (shuttingDown) {
+      if (children.size === 0) {
+        process.exit(requestedExitCode);
+      }
+      return;
+    }
+
+    const exitCode = code ?? (signal ? 1 : 0);
+    requestedExitCode = exitCode;
+    stopAll();
+    process.exitCode = exitCode;
+  });
+}
+
+process.on("SIGINT", () => {
+  requestedExitCode = 130;
+  stopAll("SIGINT");
+});
+process.on("SIGTERM", () => {
+  requestedExitCode = 143;
+  stopAll("SIGTERM");
+});
+process.on("exit", () => stopAll());

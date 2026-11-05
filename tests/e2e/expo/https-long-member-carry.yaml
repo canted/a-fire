@@ -1,0 +1,21 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/chat
+- extendedWaitUntil:
+    visible: Open Room details
+    timeout: 30000
+- tapOn: Open Room details
+- extendedWaitUntil:
+    visible: Carry peer 01
+    timeout: 15000
+- takeScreenshot: long-carry-start
+# The gesture begins horizontally, then reaches the lower edge while held.
+- swipe:
+    start: '25%,88%'
+    end: '75%,94%'
+    duration: 6000
+- takeScreenshot: long-carry-after-edge
+- extendedWaitUntil:
+    visible: Room invitation sent.
+    timeout: 15000

@@ -1,0 +1,15 @@
+appId: co.canted.afire.preview.localhttps
+---
+- tapOn: 'Retry audio'
+- tapOn: 'Retry video'
+- extendedWaitUntil:
+    visible: 'Play audio'
+    timeout: 15000
+- assertNotVisible: 'Retry audio'
+- assertNotVisible: 'Retry video'
+- tapOn:
+    text: 'Play audio'
+    waitToSettleTimeoutMs: 0
+- assertVisible: 'Pause audio'
+- assertVisible: 'Synthetic video study'
+- takeScreenshot: recovered-media-bytes

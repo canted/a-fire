@@ -1,0 +1,307 @@
+:root {
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  /* Typography */
+  --font-hero: "Poppins", sans-serif;
+  --font-display: "Barlow Condensed", sans-serif;
+  /*--font-display: "Noto Serif", serif;*/
+  /*--font-display: "EB Garamond", serif;*/
+  /*--font-script: "La Belle Aurore", serif;*/
+  --font-heading: "Poppins", sans-serif;
+  --font-body: "Lato", sans-serif;
+
+  --text-size-2xs: 0.75rem;
+  --text-size-xs: 0.8125rem;
+  --text-size-sm: 0.875rem;
+  --text-size-base: 1rem;
+  --text-size-lg: 1.125rem;
+  --text-size-xl: 1.25rem;
+  --text-size-2xl: 1.5rem;
+  --text-size-3xl: 1.875rem;
+
+  --text-weight-regular: 400;
+  --text-weight-medium: 500;
+  --text-weight-semibold: 600;
+  --text-weight-bold: 700;
+
+  /* Shared circular identities; grouped Chat stripes retain their own layout. */
+  --user-identity-avatar-size: 1.7rem;
+  --user-identity-entry-avatar-size: 2rem;
+  --user-identity-gap: 0.62rem;
+  --user-identity-compact-avatar-size: 1.55rem;
+  --user-identity-compact-gap: 0.45rem;
+
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.25;
+  --line-height-normal: 1.5;
+
+  /* Color */
+  /* Primary hue palette. Semantic and component colors may alias these when
+     the hue and the role are intentionally the same. */
+  --color-red: #db4275;
+  --color-red-dark: #5e122b;
+  --color-orange: #e05b52;
+  --color-orange-dark: #72231e;
+  --color-yellow: #dbbd42;
+  --color-text-selection: #fff59d;
+  --color-yellow-dark: #6d5603;
+  --color-green: #6eb951;
+  --color-green-dark: #2b561b;
+  --color-aqua: #3aa8be;
+  --color-aqua-dark: #213d45;
+  --color-blue: #2c7fd8;
+  --color-blue-dark: #153c66;
+  --color-purple: #7c66cc;
+  --color-purple-dark: #291d53;
+  --color-round-event-surface: #f2ebf8;
+  --color-round-event-accent: #795494;
+  --color-round-event-muted: #8c70a5;
+  --color-round-event-border: #c8b5d8;
+
+  --color-surface: #f4f3f0;
+  --color-surface-muted: #eeeeee;
+  --color-media-tile-control: #4b4b4b;
+  --color-waveform-placeholder: #8d9293; /* Ink mixed halfway with white. */
+  --color-paper: #ffffff;
+  --color-circle-identity-surface: var(--color-paper);
+  --color-circle-identity-chip-surface: var(--color-circle-identity-surface);
+  --color-workspace-tab-active: #2c7492;
+  --color-new-post-action: #71cb4d;
+  --color-project-entry-action: #6250f4;
+  --color-post-square-surface: var(--color-paper);
+  --color-crease: #dcccc1;
+  --color-black: #000000;
+  --color-ink: #1a2527; /*#1f1a1a;*/
+  --color-ink-muted: #453939;
+  --color-ink-subtle: #6f6a64;
+  --color-accent: #1a2527; /*#e17865; #f5b41a*/
+  --color-accent-strong: #1a2527; /*#ef5757; #ff981a*/
+  --color-success: #5bc251;
+  --color-success-strong: #5dab49;
+  --color-danger: #e7522c;
+  --color-danger-strong: #a52411;
+  --color-info: #52bfdb;
+  --color-cool: #52bfdb;
+  --color-cool-pale: #9de1ea;
+  --color-deep-blue: #338fcc;
+  --color-cool-strong: #23b2c7;
+  --color-cool-dark: #1e454b;
+  --color-cool-darker: #1a2527; /* #274364; */
+  --color-cool-soft: #e8f1fb;
+  --color-plum: #703d50;
+  --color-charcoal: #313d3d;
+  --color-gray-light: #f2f2f2;
+  --color-gray-medium: #b5b5b5;
+  --color-bright: #fccd61;
+  --color-warning: #f5b41a;
+  --color-warning-dark: #ff990b;
+  --color-fire: #ff981a;
+  --color-fire-bright: #f5b41a;
+  --color-waveform-played: var(--color-red-dark);
+  --color-waveform-unplayed: #cbd1d2;
+  --color-waveform-time: #e86e49;
+  --color-feedback-impression: #85d1db;
+  --color-feedback-question: var(--color-post-gradient-start);
+  --color-feedback-idea: #ea7542;
+  --color-post-gradient-start: #fbd16e;
+  --color-post-gradient-end: #feb04c;
+  --color-post-text-cool: #4dbbcb;
+  --color-post-text-blue: #2871d7;
+  --color-post-text-blue-top: #5182c2;
+  --color-post-text-green: #5bc251;
+  --color-post-text-green-top: #93dd8c;
+  --color-border: rgba(57, 47, 47, 0.12);
+  --color-border-strong: rgba(57, 47, 47, 0.28);
+  --color-accent-soft: #f7dfd9;
+  --color-overlay: rgba(31, 26, 26, 0.6);
+  --color-long-press-highlight: rgba(26, 37, 39, 0.1);
+
+  /* Spacing */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* App layout grid */
+  --app-layout-max-width: 760px;
+  --app-grid-width: min(100vw, var(--app-layout-max-width));
+  --app-grid-unit: calc(var(--app-grid-width) / 72);
+  --app-grid-unit-0-5: calc(var(--app-grid-unit) * 0.5);
+  --app-grid-unit-1: var(--app-grid-unit);
+  --app-grid-unit-1-5: calc(var(--app-grid-unit) * 1.5);
+  --app-grid-unit-2: calc(var(--app-grid-unit) * 2);
+  --app-grid-unit-3: calc(var(--app-grid-unit) * 3);
+  --app-grid-unit-3-5: calc(var(--app-grid-unit) * 3.5);
+  --app-grid-unit-4: calc(var(--app-grid-unit) * 4);
+  --app-grid-unit-6: calc(var(--app-grid-unit) * 6);
+  --app-grid-unit-8: calc(var(--app-grid-unit) * 8);
+  --app-grid-unit-13: calc(var(--app-grid-unit) * 13);
+  --app-grid-unit-15-5: calc(var(--app-grid-unit) * 15.5);
+  --app-grid-unit-28: calc(var(--app-grid-unit) * 28);
+  --app-grid-unit-33: calc(var(--app-grid-unit) * 33);
+
+  /* Two mobile 33-unit squares fit between the shared page insets and the
+     existing grid gap. Four-column layouts retain the 136px desktop cap. */
+  --post-square-unit: calc((var(--app-grid-width) - var(--app-page-inset-start) - var(--app-page-inset-end) - var(--app-grid-unit-2)) / 66);
+  --post-square-size: calc(var(--post-square-unit) * 33);
+  --post-square-stripe-width: calc(var(--post-square-unit) * 4);
+  --post-square-gap: var(--post-square-unit);
+  --post-square-header-height: calc(var(--post-square-unit) * 4);
+  --post-square-content-height: calc(var(--post-square-unit) * 28);
+
+  /* Universal application chrome */
+  /* One horizontal edge for page content and chrome, independent of the grid. */
+  --app-page-inline-inset: var(--space-sm);
+  --app-page-inset-start: max(var(--app-page-inline-inset), env(safe-area-inset-left, 0px));
+  --app-page-inset-end: max(var(--app-page-inline-inset), env(safe-area-inset-right, 0px));
+  --app-content-inline-inset: var(--app-page-inline-inset);
+  --app-bar-inline-inset: var(--app-page-inline-inset);
+  --app-bar-control-size: 2.75rem;
+  --app-bar-glyph-size: 1.875rem;
+  --room-app-bar-top-inset: var(--space-sm);
+  --room-app-bar-height: calc(2.5rem + var(--room-app-bar-top-inset) * 2);
+  --bottom-toolbar-inline-inset: var(--app-page-inline-inset);
+  --bottom-toolbar-control-padding: 0.25rem;
+  --bottom-toolbar-extra-bottom-space: 20px;
+  --bottom-toolbar-bottom-inset: calc(
+    max(1rem, env(safe-area-inset-bottom, 0px)) +
+      var(--bottom-toolbar-extra-bottom-space)
+  );
+  --bottom-toolbar-height: calc(
+    3.25rem + var(--bottom-toolbar-bottom-inset) + 1px
+  );
+  --bottom-toolbar-content-clearance: calc(
+    var(--bottom-toolbar-height) + var(--space-xl)
+  );
+  --bottom-nav-height: var(--bottom-toolbar-height);
+  --viewport-content-bottom-clearance: 6.375rem;
+  --audio-player-height: 2.5rem;
+  --audio-player-toolbar-gap: 0.5rem;
+  --audio-player-side-action-clearance: 3.75rem;
+  /* User avatar stripes are a universal 20px identity mark. Their height may
+     change by context, but features must not redefine their width or radius. */
+  --avatar-stripe-width: 1.25rem;
+  --avatar-stripe-radius: calc(0.5 * var(--avatar-stripe-width));
+
+  /* Radii */
+  --radius-xs: 0.1rem;
+  --radius-sm: 0.1rem;
+  --radius-md: 0.1rem;
+  --radius-lg: 0.2rem;
+  --radius-action-square: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Shadows and paper/fold cues */
+  --shadow-flat: 0 1px 2px rgba(17, 12, 8, 0.07);
+  --shadow-soft: 0 6px 16px rgba(17, 12, 8, 0.08);
+  --shadow-lifted: 0 14px 32px rgba(17, 12, 8, 0.12);
+  --shadow-crease:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(17, 12, 8, 0.05), 0 8px 20px rgba(17, 12, 8, 0.08);
+  --shadow-layered:
+    0 8px 18px rgba(17, 12, 8, 0.08), 0 2px 0 0 rgba(216, 205, 189, 0.7);
+
+  /* Z-index */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-toast: 5300;
+  --z-bottom-nav: 5000;
+  --z-audio-player: 5150;
+  --z-overlay: 5999;
+  --z-modal: 6000;
+  --z-editor-menu: 5200;
+
+  /* Component-ish tokens */
+  --panel-bg: var(--color-surface);
+  --panel-border: var(--color-border);
+  --panel-radius: var(--radius-lg);
+  --panel-shadow: var(--shadow-layered);
+  --color-panel: var(--panel-bg);
+  --nav-bg: var(--color-cool-darker);
+  --nav-border: var(--color-cool-darker);
+  --nav-icon: var(--color-bright);
+  --nav-icon-active: var(--color-fire-bright);
+  --color-nav-bg: var(--nav-bg);
+  --color-nav-icon: var(--nav-icon);
+  --color-nav-icon-active: var(--nav-icon-active);
+  --card-bg: var(--panel-bg);
+  --card-border: var(--panel-border);
+  --card-shadow: var(--panel-shadow);
+  --color-general-primary: var(--color-ink);
+  --color-general-muted: var(--color-ink-muted);
+  --color-general-border: var(--color-border);
+  --focus-ring: var(--color-purple);
+  --focus-ring-offset: var(--color-paper);
+  --focus-outline: 2px solid var(--focus-ring);
+  --focus-outline-offset: 3px;
+  --muted-surface: var(--color-surface-muted);
+  --accent-soft-bg: var(--color-accent-soft);
+
+  /* shadcn */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 3.9%;
+  --primary: 0 0% 9%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 0 0% 96.1%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96.1%;
+  --muted-foreground: 0 0% 45.1%;
+  --accent: 0 0% 96.1%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 89.8%;
+  --input: 0 0% 89.8%;
+  --ring: 0 0% 3.9%;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --radius: 0.5rem;
+}
+
+@media (min-width: 540px) {
+  :root {
+    --post-square-unit: clamp(3.5152px, 0.64394vw, 4.1212px);
+  }
+}
+
+[data-theme="site"] {
+  --font-hero: "Grenze Gotisch", serif;
+  --font-heading: "Grenze Gotisch", serif;
+}
+
+.dark {
+  --color-long-press-highlight: rgba(255, 255, 255, 0.12);
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 9%;
+  --secondary: 0 0% 14.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  --accent: 0 0% 14.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 14.9%;
+  --input: 0 0% 14.9%;
+  --ring: 0 0% 83.1%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+}

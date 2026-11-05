@@ -1,0 +1,260 @@
+[
+  {
+    "id": "@expo/cli@57.0.28",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/cli/package.json",
+    "published": "2026-10-06T12:10:48.044Z",
+    "integrity": "sha512-4969gk/B2JyP3kAv2ftpwU1f9dLG2j9TsQuYCTTjfnyRx0O49Jwu1O1mie2c3HmKXbwfNA6QTS+3i3sNetMTag=="
+  },
+  {
+    "id": "@expo/config-plugins@57.0.10",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/config-plugins/package.json",
+    "published": "2026-10-06T12:14:47.038Z",
+    "integrity": "sha512-XFcj01blofSohoOxibrPsrsFPt2gAigrcWE3s6Vg+rSHvP9QVEfnyfmJNVsuIVT0EjY/1rZVJ4SajNDR5cJjpA=="
+  },
+  {
+    "id": "@expo/config@57.0.10",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/config/package.json",
+    "published": "2026-10-06T12:11:25.479Z",
+    "integrity": "sha512-YpexTqLWEXdbbXgHh7Zhpq+qA5diuvO46lb7TiY81JwqKLAl9zK31APY1D7jUFlDX56owje5RtK0o5bMmGIMUg=="
+  },
+  {
+    "id": "@expo/env@2.4.3",
+    "source": "https://raw.githubusercontent.com/expo/expo/c3739f09b6a7620729ce7e305e88a2ec8bc79c3c/packages/@expo/env/package.json",
+    "published": "2026-08-28T10:49:03.421Z",
+    "integrity": "sha512-M1NXeZCA1mkMkYOyIe7PlyRX0/jqFtMoJgyblnlq/vpCRfmueFT7RnGSQG8uEFDF5WHOFGijAQ3fogPh3/n5Ng=="
+  },
+  {
+    "id": "@expo/fingerprint@0.20.13",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/@expo/fingerprint/package.json",
+    "published": "2026-09-11T11:32:09.961Z",
+    "integrity": "sha512-h1x+w+JpNRu88a/5SMZRzJs9YDGR/f7R8ApCr7OdenhqmJ00hFxQMzvxajDLL+1P2Y2g/ND0xksusqvBqWSW5Q=="
+  },
+  {
+    "id": "@expo/image-utils@0.11.6",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/image-utils/package.json",
+    "published": "2026-10-06T12:10:23.818Z",
+    "integrity": "sha512-rmMpn7QGp6pUGRCQ3vvB9RP/vqq2q/PpToRh4dL/FbhSZOLZ1YTotpuLHf71FGOEfgKil/4PCd3hkWe/CCeiEg=="
+  },
+  {
+    "id": "@expo/inline-modules@0.1.7",
+    "source": "https://raw.githubusercontent.com/expo/expo/c300d2cc60c9e684e64f48d9bc90ea18a571d01d/packages/@expo/inline-modules/package.json",
+    "published": "2026-08-26T19:59:25.122Z",
+    "integrity": "sha512-Bz/khd1gIJqDkje7t5ejD5e9jFbm4xEJzWSwRKadRo6gruepbw1xJ3Eb+e58OS8fY1ZNQYjzZbspnuph67sN0g=="
+  },
+  {
+    "id": "@expo/local-build-cache-provider@57.0.8",
+    "source": "https://raw.githubusercontent.com/expo/expo/c300d2cc60c9e684e64f48d9bc90ea18a571d01d/packages/@expo/local-build-cache-provider/package.json",
+    "published": "2026-08-26T19:59:14.470Z",
+    "integrity": "sha512-SEdE0pAQrr90bRh3MNR0ZuwoIBw390cYdFgbn7Vk0Mtm9EHaBfP7kYj+2hXnXZJgOEm3/JMtfoD3rV7rWA9FGg=="
+  },
+  {
+    "id": "@expo/log-box@57.0.4",
+    "source": "https://raw.githubusercontent.com/expo/expo/c300d2cc60c9e684e64f48d9bc90ea18a571d01d/packages/@expo/log-box/package.json",
+    "published": "2026-08-26T20:00:23.946Z",
+    "integrity": "sha512-IxwS9s1L2muj8mj8AQSuiy7u8OFJdc02NRFo2me/Tj6DiaeG5SREqmpBE4rQpR2cadqSg5jl8Qab8Cjie616dg=="
+  },
+  {
+    "id": "@expo/metro-config@57.0.13",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/metro-config/package.json",
+    "published": "2026-10-06T12:11:40.597Z",
+    "integrity": "sha512-r+YCwqh8FM5cymkC3MdYO32DqLZQ2wDWkGEnzwgwI40Bj355BvL4XoY0hGgao9vNHjYa7be7XxbVqtMTi76snw=="
+  },
+  {
+    "id": "@expo/metro-file-map@57.0.4",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/metro-file-map/package.json",
+    "published": "2026-10-06T12:09:41.078Z",
+    "integrity": "sha512-gLABIbU3SlxRVVCe56ZfYFbxjhdpAKomQYr6LIeDYf7rca8Pfvzv8FS39hH0+IcdpEHly2Jy0X2nd4/obd8Kig=="
+  },
+  {
+    "id": "@expo/metro-runtime@57.0.16",
+    "source": "https://raw.githubusercontent.com/expo/expo/7687b07947a5c866adeb11abbceae72403ccb188/packages/@expo/metro-runtime/package.json",
+    "published": "2026-09-18T08:13:10.553Z",
+    "integrity": "sha512-x43WgZoICpp37BhDV7vixe0bNxbVPPGaBLHYc98ZJ8MU+UC2dk39Y2XvkfYMRRbAUSIkCIJiwdERnptlPg0Ckw=="
+  },
+  {
+    "id": "@expo/prebuild-config@57.0.17",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/prebuild-config/package.json",
+    "published": "2026-10-06T12:13:08.588Z",
+    "integrity": "sha512-PnPw4QT8afAA1RqTktK89+JpyJz46cZsZx6gEAe6QCHgOHc7dlA0rXlOFy0xbHpBnYT8x7wl6vTz2ydT99gykw=="
+  },
+  {
+    "id": "@expo/require-utils@57.0.6",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/require-utils/package.json",
+    "published": "2026-10-06T12:09:56.512Z",
+    "integrity": "sha512-PKWfFdMgwWrlSP6NGplCi2nK0dEM5MeJ2Cj1ijr5VWTmZ+pKsJsJw2dWkBtlFDyxMY8eUjCPZ7hoqFEnbc0Pcw=="
+  },
+  {
+    "id": "@expo/router-server@57.0.12",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/@expo/router-server/package.json",
+    "published": "2026-10-06T12:10:13.466Z",
+    "integrity": "sha512-afP8Lu+ozEP/6qvLuxeBKoBVSeU+e0zwk+iYBUM6fBxGRniJQyG1HqpHQFr0ZEocuVxRjmq9eoCnspFuuzDQoA=="
+  },
+  {
+    "id": "@expo/ui@57.0.22",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo-ui/package.json",
+    "published": "2026-10-06T12:15:14.261Z",
+    "integrity": "sha512-v0p397fI7XhYBt+O5Q4MCWKB1lwR8cA2xjoQbc/V6W+EmP9qU1sHh0eQ7QHdeE/lyNjWW4wIut0/H/8OjcHo3w=="
+  },
+  {
+    "id": "babel-preset-expo@57.0.14",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/babel-preset-expo/package.json",
+    "published": "2026-10-06T12:09:29.704Z",
+    "integrity": "sha512-ALhPgXS0pvMcuORYh3THz4qYhQlOsRIw6FB+AbawM81tvP9V9pZpiK+Au9wihyYIb/Hdv2Z7Zwud4tFXF1ysJQ=="
+  },
+  {
+    "id": "expo-asset@57.0.19",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo-asset/package.json",
+    "published": "2026-10-06T12:09:40.922Z",
+    "integrity": "sha512-y9ymKidyPBDUFXljbvo7LNgivQvMhEJEoEXi6aLRugUxRDUvAKoZsy+KB5UXSjLMS7l7JNDwYKk5thovI0MLog=="
+  },
+  {
+    "id": "expo-constants@57.0.21",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo-constants/package.json",
+    "published": "2026-10-06T12:10:52.271Z",
+    "integrity": "sha512-D5fV2GELYGbNkoiEVZZp5zrUXZDaAx6ZzErDzGirm3jCjOhaE8iU/GyJiB0ZQE+K4Bg8gY82nIQ/RZR8CJLVjA=="
+  },
+  {
+    "id": "expo-dev-client@57.0.19",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-dev-client/package.json",
+    "published": "2026-09-11T11:32:24.298Z",
+    "integrity": "sha512-7giMK6BLL685GECHem2UAQvS473ImZLi5l+Q5tq+XSyv6I9UNVPs0p07mKwgBzq8z7DR3d4nTl702ziFxTjO3Q==",
+    "approved": "2026-10-14: user approved six exact development-client versions"
+  },
+  {
+    "id": "expo-dev-launcher@57.0.20",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-dev-launcher/package.json",
+    "published": "2026-09-11T11:32:39.898Z",
+    "integrity": "sha512-F6oAHaDn9j3L/gyMGE+OalriX6PHZWnZLxpN5jc6crTrp8f6hSwGhmsHpAvdOzijfMjyi3R2UkcISFsCIIQYFA==",
+    "approved": "2026-10-14: user approved six exact development-client versions"
+  },
+  {
+    "id": "expo-dev-menu@57.0.19",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo-dev-menu/package.json",
+    "published": "2026-10-06T12:12:37.796Z",
+    "integrity": "sha512-7mE4TytDPgF+a5hisGQKpzd8WfEb7cQOHNARAXSJqogR33qeHVaYfXtsC/DLMV/oAhPr5/rItknT1LyIWbQZUQ==",
+    "approved": "2026-10-14: user approved six exact development-client versions"
+  },
+  {
+    "id": "expo-file-system@57.0.7",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-file-system/package.json",
+    "published": "2026-09-11T11:32:30.252Z",
+    "integrity": "sha512-1vkZRadOsIputFDBcclqBa1pO3iXOO6iIsdqJipQWw4V5TSnWgmRTuOF7ro8IzrVue+PHbum++KCG3Tawem4cg=="
+  },
+  {
+    "id": "expo-font@57.0.4",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-font/package.json",
+    "published": "2026-09-11T11:31:54.373Z",
+    "integrity": "sha512-7WOMC2oA6xCfOm8bbofqWn2bIqyWFm7YLEnpc/gA1MJH0Ll0TfT/3+CqRkoW2eNRWMS8sxrz5WukUmSvmNquHA=="
+  },
+  {
+    "id": "expo-glass-effect@57.0.4",
+    "source": "https://raw.githubusercontent.com/expo/expo/9349d1457178dd9cccb8bdd3aed47473c49134e1/packages/expo-glass-effect/package.json",
+    "published": "2026-09-24T10:12:38.497Z",
+    "integrity": "sha512-/AG2Kljbqfgxu+GchI2YFIbxiF9cPsIpCy4iNDzlRiZk9rvR6BwRfB6gfQVu3V2ExaoGf2h5IsEnqVI5MYNBAg=="
+  },
+  {
+    "id": "expo-json-utils@57.0.2",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-json-utils/package.json",
+    "published": "2026-09-11T11:30:49.868Z",
+    "integrity": "sha512-9kYZECLKE3pYZQs+kt3+ggY83Lfryog9/UEo3HJKGcHUZeKKtlFBIPFjI4LzREubsvjP7AsvG0FdEX9EquIoAQ==",
+    "approved": "2026-10-14: user approved six exact development-client versions"
+  },
+  {
+    "id": "expo-keep-awake@57.0.2",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-keep-awake/package.json",
+    "published": "2026-09-11T11:29:37.155Z",
+    "integrity": "sha512-GqgH746wtJImmsbyHmCQoi7cOslKuWQBbJHXr53S35Bpf5UvxCAztvnitUEd7D0QvFN2rvkOhylbZpgZZfBLlQ=="
+  },
+  {
+    "id": "expo-linking@57.0.12",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo-linking/package.json",
+    "published": "2026-10-06T12:09:57.269Z",
+    "integrity": "sha512-oKLva5FOBx4txZa9LFu6RaHGAy1lFCyoOM91uU9H+gZi1iskjuSxV12GgS9H+yGGe2aSLufh6IfwSWrjEIsOuA=="
+  },
+  {
+    "id": "expo-manifests@57.0.2",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-manifests/package.json",
+    "published": "2026-09-11T11:29:38.734Z",
+    "integrity": "sha512-pPIIcKR73OShwlWMg8H90WRzKUd2krDdKlKAwuQV1FtUwE7H3hQEFw0ePFQY9yFoGMF/77ryYwNKfI5umMcCog==",
+    "approved": "2026-10-14: user approved six exact development-client versions"
+  },
+  {
+    "id": "expo-modules-autolinking@57.0.14",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo-modules-autolinking/package.json",
+    "published": "2026-10-06T12:10:35.965Z",
+    "integrity": "sha512-dWql3NU2tvgfwkdZY3u9Sy3iWRA4IGDk91aOGZAJm3ZqudFxDRzAxlh8oQCVQ81Z+U9VmlUXw/4P9CbL33Ty0A=="
+  },
+  {
+    "id": "expo-modules-core@57.0.21",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo-modules-core/package.json",
+    "published": "2026-10-06T12:11:37.461Z",
+    "integrity": "sha512-g0pf9/tQ6IdJWCzr6PDrEiYT8mTaOhMRnXm3T2XtSzJJaNYgnyyDonkkPN1wd2+PqojIBPhytqqzeLxjM5y/Wg=="
+  },
+  {
+    "id": "expo-modules-jsi@57.1.1",
+    "source": "https://raw.githubusercontent.com/expo/expo/9349d1457178dd9cccb8bdd3aed47473c49134e1/packages/expo-modules-jsi/package.json",
+    "published": "2026-09-24T10:14:12.268Z",
+    "integrity": "sha512-ssnwz3ZuIgCbZj5A3J6NlhQrXZojg+BjkeWrOWqVJhyMHlV/A/cRT7s986chKku97BFt6ucmDu6/BCzrV45Wcw=="
+  },
+  {
+    "id": "expo-router@57.0.25",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo-router/package.json",
+    "published": "2026-10-06T12:10:55.270Z",
+    "integrity": "sha512-S/xWUGeVqMozG8gFJT0CHOVErZEbQnsAEAqlBIvHJSUZPH0hBcxy2kduUrV7ZDLNI4xCPIlOJ4SI29X/1z/hxw=="
+  },
+  {
+    "id": "expo-server@57.0.3",
+    "source": "https://raw.githubusercontent.com/expo/expo/125b8d4472432db3dc4ae047730432d7bd5bd30c/packages/expo-server/package.json",
+    "published": "2026-08-14T14:22:51.084Z",
+    "integrity": "sha512-aK+LdKzauHSGmsOStZtyxdzv0zWssCkxTw3m4QuOhfDSJsZaMRTd9O41d8ixU/QfELTbaJ0oRNcF7JFV/7O9YQ=="
+  },
+  {
+    "id": "expo-symbols@57.0.3",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-symbols/package.json",
+    "published": "2026-09-11T11:29:02.487Z",
+    "integrity": "sha512-uuK5yHLVR7kExUCrO/ItBvp/kp1maQ9Nkb6KvNy5ZUQnN0NMKwuhJ4GvbfS9N3ACmvCjTT4gKvg4yH5UuKIYNA=="
+  },
+  {
+    "id": "expo-updates-interface@57.0.2",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-updates-interface/package.json",
+    "published": "2026-09-11T11:28:19.415Z",
+    "integrity": "sha512-x3SA5toiHZEkW+5oeNdUM1Rvt6M3ExegQsSwS3Z1+S9gn9utGYTGBkb8MBQivhjIZiRlQYDIhauxA8kySQEWtQ==",
+    "approved": "2026-10-14: user approved six exact development-client versions"
+  },
+  {
+    "id": "expo@57.0.27",
+    "source": "https://raw.githubusercontent.com/expo/expo/50ac74f1ab5682c8e32b24da6e5e97dd4dbbb80f/packages/expo/package.json",
+    "published": "2026-10-06T12:10:58.345Z",
+    "integrity": "sha512-Jc3nByHsmzjakvIrqV3/3viVj+jFw1OCfMc+WpClemwL3/hSrS7ktkVCACSTI7/j+1uH+eHmBJwe1kujDLMnbQ=="
+  },
+  {
+    "id": "expo-audio@57.0.5",
+    "source": "https://raw.githubusercontent.com/expo/expo/9e5319c0f821a27b7924841903abae50e2b41790/packages/expo-audio/package.json",
+    "published": "2026-09-11T11:32:56.290Z",
+    "integrity": "sha512-39fX5JC5zDvELB4/eDJPj2XAYRN0W9+K2DfDWm5N3aC5WZ7HRrhupWtT6hbH09NlfYpsRSqYOwEZnocFM42ynQ=="
+  },
+  {
+    "id": "expo-video@57.0.5",
+    "source": "https://raw.githubusercontent.com/expo/expo/9349d1457178dd9cccb8bdd3aed47473c49134e1/packages/expo-video/package.json",
+    "published": "2026-09-24T10:13:03.992Z",
+    "integrity": "sha512-VK2o+d6rb+tVeL2DI6d0F58pRV8d8bctLpOrMJEHRYtMIK5iwvjjrRx2mciYN8/d04SgWC8TkI+wuZ8Sbp/yuA=="
+  },
+  {
+    "id": "expo-sharing@57.0.23",
+    "source": "https://raw.githubusercontent.com/expo/expo/58da4edafcb043872c3ed9bf8f5957e6544d0a9c/packages/expo-sharing/package.json",
+    "published": "2026-10-12T14:25:24.160Z",
+    "integrity": "sha512-fN+jrqoWwOpIo+X4utiu/ayCWym23DMgvrTJUHoopkBeO6rEa79ZY4f6ApOlRxvEx2NgQgJEQX+cbPJrjOSRog=="
+  },
+  {
+    "id": "expo-image-picker@57.0.20",
+    "source": "https://raw.githubusercontent.com/expo/expo/9349d1457178dd9cccb8bdd3aed47473c49134e1/packages/expo-image-picker/package.json",
+    "published": "2026-09-24T10:14:14.307Z",
+    "integrity": "sha512-plgcGuMZMWqDchjXQW6S/WepYLB5KqfbZOzwC6xe0+j5IhY4ipvVuRZcXeP/0NgKgU0Jiu/XoTK4Bi8crtZ+sQ=="
+  },
+  {
+    "id": "expo-document-picker@57.0.3",
+    "source": "https://raw.githubusercontent.com/expo/expo/ad1efa3fa5802156660198ba5d787f91014d8df3/packages/expo-document-picker/package.json",
+    "published": "2026-09-29T10:55:45.784Z",
+    "integrity": "sha512-XlxdZ0zzv44JRD8O15DISgIO8FTaZ581oc4kQp6MJoR7vdahjcY+2qCuDt5k1J8/lc0YR+bXon/v81norciuxw=="
+  }
+]

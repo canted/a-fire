@@ -1,0 +1,16 @@
+appId: co.canted.afire.preview.localhttps
+---
+- tapOn: Verification code
+- inputText: ${OTP}
+- swipe:
+    start: 50%, 40%
+    end: 50%, 20%
+- scrollUntilVisible:
+    element: Sign in
+    direction: DOWN
+    timeout: 15000
+- tapOn: Sign in
+- extendedWaitUntil:
+    visible: "${typeof EXPECTED_SCREEN === 'undefined' ? 'Rooms' : EXPECTED_SCREEN}"
+    timeout: 30000
+- takeScreenshot: https-release-home

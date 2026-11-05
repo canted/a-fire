@@ -1,0 +1,140 @@
+#!/usr/bin/env node
+
+import fs from "node:fs";
+import process from "node:process";
+
+const DEFAULT_CONFIG_PATH = "fly.toml";
+const PROBE_TIMEOUT_MS = Number(process.env.SMOKE_TIMEOUT_MS ?? 10_000);
+
+export function parseSmokeArgs(argv) {
+  const parsed = {
+    app: process.env.FLY_APP_NAME,
+    baseUrl: process.env.SMOKE_BASE_URL,
+    configPath: process.env.FLY_CONFIG ?? DEFAULT_CONFIG_PATH,
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (/^https?:\/\//i.test(arg)) {
+      parsed.baseUrl = arg;
+      continue;
+    }
+    if (arg === "-a" || arg === "--app") {
+      parsed.app = argv[index + 1];
+      index += 1;
+      continue;
+    }
+    if (arg.startsWith("--app=")) {
+      parsed.app = arg.slice("--app=".length);
+      continue;
+    }
+    if (arg === "-c" || arg === "--config") {
+      parsed.configPath = argv[index + 1];
+      index += 1;
+      continue;
+    }
+    if (arg.startsWith("--config=")) {
+      parsed.configPath = arg.slice("--config=".length);
+    }
+  }
+
+  return parsed;
+}
+
+export function flyAppFromConfig(configPath = DEFAULT_CONFIG_PATH) {
+  if (!fs.existsSync(configPath)) return null;
+  const config = fs.readFileSync(configPath, "utf8");
+  const match = config.match(/^\s*app\s*=\s*['"]([^'"]+)['"]/m);
+  return match?.[1] ?? null;
+}
+
+export function smokeBaseUrl(options) {
+  if (options.baseUrl) return stripTrailingSlash(options.baseUrl);
+  const app = options.app ?? flyAppFromConfig(options.configPath);
+  if (!app) {
+    throw new Error("SMOKE_BASE_URL or Fly app name is required for server smoke tests.");
+  }
+  return `https://${app}.fly.dev`;
+}
+
+export function healthFailures(payload, options = {}) {
+  const requireVapid = options.requireVapid ?? process.env.SMOKE_REQUIRE_VAPID !== "0";
+  const failures = [];
+
+  if (payload?.status !== "ok") failures.push(`status=${String(payload?.status)}`);
+  if (payload?.db !== "ok") failures.push(`db=${String(payload?.db)}`);
+  if (requireVapid && payload?.vapid !== "ok") failures.push(`vapid=${String(payload?.vapid)}`);
+
+  return failures;
+}
+
+async function fetchWithTimeout(url) {
+  return fetch(url, { signal: AbortSignal.timeout(PROBE_TIMEOUT_MS) });
+}
+
+async function fetchJson(url) {
+  const response = await fetchWithTimeout(url);
+  if (!response.ok) {
+    throw new Error(`${url} returned HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+async function checkHealth(baseUrl) {
+  const url = `${baseUrl}/api/v1/health`;
+  const payload = await fetchJson(url);
+  const failures = healthFailures(payload);
+  if (failures.length > 0) {
+    throw new Error(`${url} failed smoke check: ${failures.join(", ")}`);
+  }
+  log(`ok health ${url}`);
+}
+
+async function checkClientBuild(baseUrl) {
+  if (process.env.SMOKE_REQUIRE_CLIENT_BUILD === "0") return;
+
+  const url = `${baseUrl}/api/client-build`;
+  const payload = await fetchJson(url);
+  if (!payload?.buildId) {
+    throw new Error(`${url} did not report a built frontend buildId`);
+  }
+  log(`ok client-build ${url}`);
+}
+
+async function checkAppShell(baseUrl) {
+  if (process.env.SMOKE_REQUIRE_APP_SHELL === "0") return;
+
+  const url = `${baseUrl}/app`;
+  const response = await fetchWithTimeout(url);
+  if (!response.ok) {
+    throw new Error(`${url} returned HTTP ${response.status}`);
+  }
+  const html = await response.text();
+  if (!html.includes('<div id="root">') || !html.includes('name="vapid-public-key"')) {
+    throw new Error(`${url} did not look like the built app shell`);
+  }
+  log(`ok app-shell ${url}`);
+}
+
+async function main() {
+  const baseUrl = smokeBaseUrl(parseSmokeArgs(process.argv.slice(2)));
+  log(`Running server smoke tests against ${baseUrl}`);
+  await checkHealth(baseUrl);
+  await checkClientBuild(baseUrl);
+  await checkAppShell(baseUrl);
+}
+
+function stripTrailingSlash(value) {
+  return value.replace(/\/+$/, "");
+}
+
+function log(message) {
+  process.stdout.write(`${message}\n`);
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+}

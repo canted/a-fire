@@ -1,0 +1,6 @@
+:global([data-entry-transition]) { view-transition-name: entry-surface; }
+:global(html[data-entry-navigation]::view-transition-group(entry-surface)) { animation-duration: 300ms; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+:global(html[data-entry-navigation]::view-transition-old(entry-surface)),
+:global(html[data-entry-navigation]::view-transition-new(entry-surface)) { height: 100%; overflow: clip; object-fit: cover; object-position: top; }
+:global(html[data-entry-navigation]::view-transition-group(root)) { animation: none; }
+@media (prefers-reduced-motion: reduce) { :global(::view-transition-group(entry-surface)) { animation-duration: 0s; } }

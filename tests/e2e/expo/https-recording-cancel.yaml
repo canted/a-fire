@@ -1,0 +1,12 @@
+appId: co.canted.afire.preview.localhttps
+---
+- tapOn: Add attachment
+- tapOn: Record audio
+- extendedWaitUntil:
+    visible: Recording [0-9]+s
+    timeout: 15000
+- tapOn: Cancel recording
+- assertVisible: Add attachment
+- assertNotVisible: Use recording
+- assertNotVisible: Remove attachment
+- takeScreenshot: recording-cancelled

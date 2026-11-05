@@ -1,0 +1,36 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat/messages/${MESSAGE_ID}
+- extendedWaitUntil:
+    visible: Add post to a project
+    timeout: 30000
+- tapOn: Add post to a project
+- extendedWaitUntil:
+    visible: Choose project
+    timeout: 20000
+- assertVisible: Only projects associated with this post’s room are available.
+- tapOn: Chat parity destination
+- assertVisible: Back to Chat
+- openLink: afire-local-https://app/entries/${POST_ID}/project
+- extendedWaitUntil:
+    visible: Chat parity destination
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: assigned-original-post
+- tapOn: No project
+- openLink: afire-local-https://app/rooms/2856/chat/messages/${MESSAGE_ID}
+- extendedWaitUntil:
+    visible: Add post to a project
+    timeout: 20000
+- openLink: afire-local-https://app/notification-preferences
+- extendedWaitUntil:
+    visible: Expo rich content notifications
+    timeout: 20000
+- tapOn: Expo rich content notifications
+- assertVisible: Posts and mentions only
+- assertVisible: Nothing \(mute\)
+- waitForAnimationToEnd
+- takeScreenshot: notification-selector
+- tapOn: Close Expo rich content notifications
+- assertVisible: Expo rich content notifications

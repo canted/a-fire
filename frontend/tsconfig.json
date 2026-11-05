@@ -1,0 +1,20 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@tiptap/*": ["./node_modules/@tiptap/*"],
+      "color": [
+        "./node_modules/color"
+      ],
+      "mersenne-twister": [
+        "../types/mersenne-twister.d.ts"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "../types/mersenne-twister.d.ts"
+  ]
+}

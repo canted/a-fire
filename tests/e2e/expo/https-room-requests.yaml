@@ -1,0 +1,73 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Fresh seedExpoRoomManagement fixture: join request precedes knock.
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Choose Room icon
+    timeout: 30000
+- scrollUntilVisible:
+    element: ${JOIN_NAME} · Asked to join · pending
+    direction: DOWN
+- tapOn:
+    text: Decline
+    index: 0
+- extendedWaitUntil:
+    visible: ${JOIN_NAME} · Asked to join · declined
+    timeout: 15000
+- tapOn: Reconsider
+- extendedWaitUntil:
+    visible: ${JOIN_NAME} · Asked to join · pending
+    timeout: 15000
+- tapOn:
+    text: Approve
+    index: 0
+- scrollUntilVisible:
+    element: Remove ${JOIN_NAME}
+    direction: UP
+- tapOn: Remove ${JOIN_NAME}
+- tapOn: Cancel removal
+- assertVisible: Remove ${JOIN_NAME}
+- tapOn: Remove ${JOIN_NAME}
+- tapOn: Confirm removal
+- extendedWaitUntil:
+    notVisible: Remove ${JOIN_NAME}
+    timeout: 15000
+- scrollUntilVisible:
+    element: ${KNOCK_NAME} · Knocked · pending
+    direction: DOWN
+- tapOn: Decline
+- extendedWaitUntil:
+    visible: ${KNOCK_NAME} · Knocked · declined
+    timeout: 15000
+- tapOn: Reconsider
+- extendedWaitUntil:
+    notVisible: ${KNOCK_NAME} · Knocked · declined
+    timeout: 15000
+- takeScreenshot: requests-reviewed
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/invites
+- extendedWaitUntil:
+    visible: Invite email or person.*
+    timeout: 30000
+- assertNotVisible: Send host invite
+- tapOn: Invite email or person.*
+- inputText: ${INVITE_NAME}
+- extendedWaitUntil:
+    visible: ${INVITE_NAME}
+    timeout: 15000
+- tapOn:
+    text: ${INVITE_NAME}
+    below: Invite email or person.*
+- assertVisible: Clear selected person
+- tapOn: Clear selected person
+- tapOn: Invite email or person.*
+- inputText: ${INVITE_NAME}
+- tapOn:
+    text: ${INVITE_NAME}
+    below: Invite email or person.*
+- tapOn: Send Room invite
+- extendedWaitUntil:
+    visible: Invitation created. Email delivery is pending.
+    timeout: 15000
+- takeScreenshot: suggested-person-invited

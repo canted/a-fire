@@ -1,0 +1,20 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: ${ROOM_LINK}
+- repeat:
+    times: 2
+    commands:
+      - tapOn:
+          text: Open
+          optional: true
+- extendedWaitUntil:
+    visible: 'Reading 20: A short creative update.'
+    timeout: 60000
+- setOrientation: LANDSCAPE_LEFT
+- assertVisible: 'Reading 20: A short creative update.'
+- assertVisible: Back to home
+- takeScreenshot: landscape-reading-anchor
+- setOrientation: PORTRAIT
+- assertVisible: 'Reading 20: A short creative update.'
+- assertVisible: Back to home
+- takeScreenshot: portrait-reading-anchor

@@ -1,0 +1,95 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat?message=8177
+- extendedWaitUntil:
+    visible: 'Historical thread source for parity'
+    timeout: 30000
+- extendedWaitUntil:
+    notVisible: 'Finding message.*'
+    timeout: 15000
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          from:
+            text: 'Historical thread source for parity'
+            point: '60%,50%'
+          direction: RIGHT
+          duration: 300
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          from:
+            text: 'Historical thread source for parity'
+            point: '60%, 50%'
+          direction: RIGHT
+          duration: 300
+- assertVisible: 'Save revealed message 8177 to project'
+- takeScreenshot: revealed-action
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          from:
+            text: 'Historical thread source for parity'
+          direction: LEFT
+          duration: 300
+# Anchor gestures to the message so layout changes cannot target another row.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          from:
+            text: 'Historical thread source for parity'
+          direction: LEFT
+          duration: 300
+- assertNotVisible: 'Save revealed message 8177 to project'
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - swipe:
+          from:
+            text: 'Historical thread source for parity'
+            point: '10%,50%'
+          direction: RIGHT
+          duration: 300
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          from:
+            text: 'Historical thread source for parity'
+            point: '10%, 50%'
+          direction: RIGHT
+          duration: 300
+      # Continue a partial reveal to exercise the shared commit threshold.
+      - runFlow:
+          when:
+            visible: 'Save revealed message 8177 to project'
+          commands:
+            - swipe:
+                from:
+                  text: 'Historical thread source for parity'
+                  point: '10%, 50%'
+                direction: RIGHT
+                duration: 300
+- extendedWaitUntil:
+    visible: 'Chat parity destination'
+    timeout: 15000
+- takeScreenshot: project-picker
+- tapOn: 'Cancel'
+- assertVisible: 'Message Expo rich content.*'
+- openLink: afire-local-https://app/rooms/2856/chat/messages/8177
+- extendedWaitUntil:
+    visible: 'An old reply remains readable.'
+    timeout: 15000
+- takeScreenshot: historical-thread
+- tapOn: 'Back to Chat'

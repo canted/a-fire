@@ -1,0 +1,31 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- scrollUntilVisible:
+    element: "Load earlier messages|Pilot message 1:.*"
+    direction: UP
+    timeout: 20000
+- runFlow:
+    when:
+      visible: Load earlier messages
+    commands:
+      - waitForAnimationToEnd:
+          timeout: 5000
+      - tapOn:
+          text: Load earlier messages
+          retryTapIfNoChange: true
+      - extendedWaitUntil:
+          notVisible: "Load earlier messages|Loading…"
+          timeout: 15000
+- scrollUntilVisible:
+    element: "Pilot message 1:.*"
+    direction: UP
+    timeout: 20000
+- takeScreenshot: room-earliest-history
+- tapOn: Back to home
+- tapOn:
+    text: Expo Room pilot
+    index: 0
+- assertVisible: "Pilot message 1:.*"
+- takeScreenshot: room-history-restored

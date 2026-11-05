@@ -1,0 +1,147 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Use a synthetic host Room with initially empty prompt overrides.
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room name.*
+    timeout: 30000
+- scrollUntilVisible:
+    timeout: 60000
+    element:
+      id: room-first-post-prompt
+    centerElement: true
+    direction: DOWN
+- tapOn:
+    id: room-first-post-prompt
+- inputText: Welcome test.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 90%, 40%
+          end: 90%, 20%
+- scrollUntilVisible:
+    timeout: 60000
+    element:
+      id: member-prompt-${MEMBER_NAME}
+    centerElement: true
+    direction: DOWN
+- tapOn:
+    id: member-prompt-${MEMBER_NAME}
+- inputText: Member test.
+- assertVisible: Member test.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 90%, 40%
+          end: 90%, 20%
+- scrollUntilVisible:
+    timeout: 60000
+    element: Save prompts
+    direction: DOWN
+- tapOn: Save prompts
+- scrollUntilVisible:
+    timeout: 60000
+    element: Saved.
+    direction: UP
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room name.*
+    timeout: 30000
+- scrollUntilVisible:
+    timeout: 60000
+    element:
+      id: room-first-post-prompt
+    centerElement: true
+    direction: DOWN
+- assertVisible: Welcome test.
+- scrollUntilVisible:
+    timeout: 60000
+    element:
+      id: member-prompt-${MEMBER_NAME}
+    centerElement: true
+    direction: DOWN
+- assertVisible: Member test.
+- takeScreenshot: persisted-prompt-overrides
+- longPressOn:
+    id: member-prompt-${MEMBER_NAME}
+- tapOn: Select [Aa]ll
+- eraseText: 1
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 90%, 40%
+          end: 90%, 20%
+- scrollUntilVisible:
+    timeout: 60000
+    element:
+      id: room-first-post-prompt
+    centerElement: true
+    direction: UP
+- longPressOn:
+    id: room-first-post-prompt
+- tapOn: Select [Aa]ll
+- eraseText: 1
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - swipe:
+          start: 90%, 40%
+          end: 90%, 20%
+- scrollUntilVisible:
+    timeout: 60000
+    element: Save prompts
+    direction: DOWN
+- tapOn: Save prompts
+- scrollUntilVisible:
+    timeout: 60000
+    element: Saved.
+    direction: UP
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room name.*
+    timeout: 30000
+- scrollUntilVisible:
+    timeout: 60000
+    element:
+      id: room-first-post-prompt
+    centerElement: true
+    direction: DOWN
+- assertNotVisible: Welcome test.
+- scrollUntilVisible:
+    timeout: 60000
+    element:
+      id: member-prompt-${MEMBER_NAME}
+    centerElement: true
+    direction: DOWN
+- assertNotVisible: Member test.
+- takeScreenshot: restored-prompt-defaults

@@ -1,0 +1,24 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: 'Audio study @ 0:03'
+    direction: DOWN
+- tapOn: 'Audio study @ 0:03'
+- scrollUntilVisible:
+    element:
+      text: 'Play from 0:03'
+    direction: DOWN
+- tapOn: 'Play from 0:03'
+- assertVisible: 'Pause audio'
+- takeScreenshot: timestamp-playing
+- tapOn: 'Back to home'
+- openLink: ${ROOM_LINK}
+- assertVisible: 'Message Expo rich content.*'
+- assertNotVisible: 'Pause audio'
+- assertVisible: '0:0[3-7] / 0:08'
+- takeScreenshot: returned-paused

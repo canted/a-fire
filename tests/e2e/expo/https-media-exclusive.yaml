@@ -1,0 +1,26 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: 'Play audio'
+    direction: UP
+- tapOn:
+    text: 'Synthetic video study'
+    waitToSettleTimeoutMs: 0
+- tapOn:
+    text: 'Play audio'
+    waitToSettleTimeoutMs: 0
+- assertVisible: 'Pause audio'
+- tapOn:
+    text: 'Play'
+    waitToSettleTimeoutMs: 0
+# Native video controls auto-hide while the accessibility scan runs.
+# Audio must pause before its eight-second end, proving playback ownership moved.
+- assertVisible: 'Play audio'
+- assertVisible: '0:0[0-7] / 0:08'
+- takeScreenshot: video-pauses-audio

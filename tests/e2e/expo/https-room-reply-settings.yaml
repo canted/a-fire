@@ -1,0 +1,46 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room name.*
+    timeout: 30000
+- scrollUntilVisible:
+    element: Simple, selected
+    direction: DOWN
+- tapOn: Structured
+- scrollUntilVisible:
+    element: Save reply settings
+    direction: DOWN
+- tapOn: Save reply settings
+- scrollUntilVisible:
+    element: Saved.
+    direction: DOWN
+    timeout: 15000
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room name.*
+    timeout: 30000
+- scrollUntilVisible:
+    element: Structured, selected
+    direction: DOWN
+- takeScreenshot: structured-replies-persisted
+- tapOn: Simple
+- scrollUntilVisible:
+    element: Save reply settings
+    direction: DOWN
+- tapOn: Save reply settings
+- scrollUntilVisible:
+    element: Saved.
+    direction: DOWN
+    timeout: 15000
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room name.*
+    timeout: 30000
+- scrollUntilVisible:
+    element: Simple, selected
+    direction: DOWN
+- takeScreenshot: simple-replies-restored

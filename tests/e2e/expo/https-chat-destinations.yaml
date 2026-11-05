@@ -1,0 +1,37 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: 'afire-local-https://app/rooms/2856/chat/messages/8175/save'
+- extendedWaitUntil:
+    visible: 'Create a project'
+    timeout: 30000
+- tapOn: 'Create a project'
+- assertVisible: 'New project'
+- tapOn: 'Project name'
+- inputText: '${PROJECT_NAME}'
+- pressKey: Enter
+- scrollUntilVisible:
+    element: 'Create project'
+    direction: DOWN
+- takeScreenshot: new-project
+- tapOn: 'Create project'
+- extendedWaitUntil:
+    visible: '${PROJECT_NAME}'
+    timeout: 20000
+- tapOn: '${PROJECT_NAME}'
+- extendedWaitUntil:
+    visible: 'Saved to ${PROJECT_NAME}.'
+    timeout: 20000
+- takeScreenshot: created-project-save
+- openLink: 'afire-local-https://app/entries/5334'
+- extendedWaitUntil:
+    visible: 'Message this entry.*'
+    timeout: 20000
+- tapOn: 'Message this entry.*'
+- inputText: '${REPLY_TEXT}'
+- tapOn: 'Send'
+- extendedWaitUntil:
+    notVisible: 'Send'
+    timeout: 20000
+- assertVisible: '${REPLY_TEXT}'
+- takeScreenshot: entry-reply

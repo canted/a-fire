@@ -1,0 +1,21 @@
+# Pair with contentDraftRecovery unit checks: UI automation alone cannot prove
+# that no brief dirty state or redundant autosave occurred between observations.
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible:
+      text: More tools
+      enabled: true
+    timeout: 30000
+- assertVisible: Saved
+- tapOn: Note actions
+- tapOn: Preview note
+- extendedWaitUntil:
+    visible: Edit note
+    timeout: 15000
+- assertVisible: ${EXPECTED_BODY}
+- assertVisible: Saved
+- assertNotVisible: Unsaved changes
+- takeScreenshot: note-preview-clean

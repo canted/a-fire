@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.server.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM"],
+    "types": ["node"],
+    "declaration": false,
+    "sourceMap": false,
+    "noEmitOnError": true,
+    "noEmit": false,
+    "strict": true,
+    "isolatedModules": false,
+    "skipLibCheck": true
+  },
+  "include": [
+    "server/**/*.ts",
+    "types/**/*.d.ts"
+  ],
+  "exclude": [
+    "server/__tests__/**",
+    "server/**/*.test.ts"
+  ]
+}

@@ -1,0 +1,39 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}/audio-reply?audio=${AUDIO_ID}&audioNode=${AUDIO_NODE}&t=2
+- extendedWaitUntil:
+    visible: Reply to audio at 0:02
+    timeout: 30000
+- extendedWaitUntil:
+    visible:
+      text: More tools
+      enabled: true
+    timeout: 30000
+- tapOn: Note and entry text
+- inputText: ${BODY}
+- assertVisible: .*${BODY}.*
+- runFlow:
+    when:
+      platform: iOS
+      visible: Done
+    commands:
+      - tapOn: Done
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- scrollUntilVisible:
+    element: Publish audio reply
+    direction: DOWN
+- tapOn: Publish audio reply
+- extendedWaitUntil:
+    visible: Note title.*
+    timeout: 30000
+- tapOn: Note actions
+- tapOn: Preview note
+- scrollUntilVisible:
+    element: .*${BODY}.*
+    direction: DOWN
+- takeScreenshot: note-audio-reply-published

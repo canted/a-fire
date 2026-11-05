@@ -1,0 +1,84 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      text: Choose cover 1
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    text: Choose cover 1
+- assertVisible:
+    text: Choose cover 1
+    selected: true
+- scrollUntilVisible:
+    element: Use this cover
+    direction: DOWN
+    centerElement: true
+- tapOn: Use this cover
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- scrollUntilVisible:
+    element: Pin up a musical response
+    direction: DOWN
+    centerElement: true
+- tapOn: Pin up a musical response
+- scrollUntilVisible:
+    element: Create a new entry
+    direction: DOWN
+- tapOn: Create a new entry
+- extendedWaitUntil:
+    visible: Entry title.*
+    timeout: 20000
+- tapOn: Entry title.*
+- inputText: Synthetic art response
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- scrollUntilVisible:
+    element: Note and entry text
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    text: Note and entry text
+    retryTapIfNoChange: false
+- inputText: Synthetic response to the chosen cover.
+- runFlow:
+    when:
+      platform: iOS
+      visible: Done
+    commands:
+      - tapOn: Done
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- assertVisible: Synthetic response to the chosen cover.
+- scrollUntilVisible:
+    element: Publish Round contribution
+    direction: DOWN
+    centerElement: true
+- tapOn: Publish Round contribution
+- extendedWaitUntil:
+    notVisible: Publish Round contribution
+    timeout: 20000
+- scrollUntilVisible:
+    element: Replace response
+    direction: UP
+- takeScreenshot: submitted-art-response
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Replace response
+    timeout: 30000
+- takeScreenshot: persisted-art-response

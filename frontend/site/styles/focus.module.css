@@ -1,0 +1,14 @@
+/* Keyboard focus is an outward purple ring, separated from the control. */
+.control:focus-visible,
+.control:global(.Mui-focusVisible) {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-outline-offset);
+  box-shadow: 0 0 0 var(--focus-outline-offset) var(--focus-ring-offset);
+}
+
+@media (forced-colors: active) {
+  .control:focus-visible,
+  .control:global(.Mui-focusVisible) {
+    outline-color: Highlight;
+  }
+}

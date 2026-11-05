@@ -1,0 +1,26 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: afire-local-https://app/entries/5334
+- extendedWaitUntil:
+    visible: Message this entry.*
+    timeout: 30000
+- tapOn: Add attachment
+- tapOn: Choose photo or file
+- tapOn: Photo library
+- extendedWaitUntil:
+    visible: Photos
+    timeout: 20000
+
+# Simulator fixture: public/icons/icon-512.png imported as the newest photo.
+- tapOn:
+    point: '16%,28%'
+- extendedWaitUntil:
+    visible: Remove attachment
+    timeout: 10000
+- tapOn: Message this entry.*
+- inputText: iOS entry photo attachment
+- tapOn: Send
+- extendedWaitUntil:
+    notVisible: Remove attachment
+    timeout: 30000
+- takeScreenshot: photo-reply-published

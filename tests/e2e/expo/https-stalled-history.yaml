@@ -1,0 +1,15 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: ${ROOM_LINK}
+- repeat:
+    times: 2
+    commands:
+      - tapOn:
+          text: Open
+          optional: true
+- extendedWaitUntil:
+    visible: 'Finding message…'
+    timeout: 20000
+- assertVisible: 'Finding message…'
+- takeScreenshot: stalled-history

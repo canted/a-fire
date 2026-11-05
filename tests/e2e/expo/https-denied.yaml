@@ -1,0 +1,18 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: ${ROOM_LINK}
+- repeat:
+    times: 2
+    commands:
+      - tapOn:
+          text: Open
+          optional: true
+- extendedWaitUntil:
+    visible: Forbidden
+    timeout: 30000
+- assertNotVisible: 'Reading 70:.*'
+- assertNotVisible: Share in the original app
+- assertNotVisible: 'You can read this Room.*'
+- assertVisible: Try again
+- takeScreenshot: denied-cold-entry

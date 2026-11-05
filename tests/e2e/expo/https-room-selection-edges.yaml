@@ -1,0 +1,61 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat
+- extendedWaitUntil:
+    visible: Open Room details
+    timeout: 30000
+- tapOn: Open Room details
+- extendedWaitUntil:
+    visible: Start a side chat
+    timeout: 15000
+- tapOn: Start a side chat
+- assertVisible:
+    text: Create side chat
+    enabled: false
+- tapOn: Cancel selection
+- tapOn: Member actions
+- tapOn: Introduce members
+- scrollUntilVisible:
+    element: Select Expo Pilot
+    direction: DOWN
+- tapOn: Select Expo Pilot
+- scrollUntilVisible:
+    element: "Select ${typeof SECOND_MEMBER === 'undefined' ? 'Reading peer' : SECOND_MEMBER}"
+    direction: DOWN
+- tapOn: "Select ${typeof SECOND_MEMBER === 'undefined' ? 'Reading peer' : SECOND_MEMBER}"
+- scrollUntilVisible:
+    element: Members
+    direction: UP
+- runFlow:
+    when:
+      notVisible: These people have already been introduced.
+    commands:
+      - tapOn: Introduction note.*
+      - inputText: Synthetic native introduction parity check.
+      - scrollUntilVisible:
+          element: Send introduction
+          direction: DOWN
+      - tapOn: Send introduction
+      - extendedWaitUntil:
+          visible: Introduction sent.
+          timeout: 20000
+      - tapOn: Member actions
+      - tapOn: Introduce members
+      - scrollUntilVisible:
+          element: Select Expo Pilot
+          direction: DOWN
+      - tapOn: Select Expo Pilot
+      - scrollUntilVisible:
+          element: "Select ${typeof SECOND_MEMBER === 'undefined' ? 'Reading peer' : SECOND_MEMBER}"
+          direction: DOWN
+      - tapOn: "Select ${typeof SECOND_MEMBER === 'undefined' ? 'Reading peer' : SECOND_MEMBER}"
+- scrollUntilVisible:
+    element: These people have already been introduced.
+    direction: UP
+- assertVisible:
+    text: Send introduction
+    enabled: false
+- takeScreenshot: duplicate-introduction-protected
+- tapOn: Cancel selection
+- assertNotVisible: Send introduction

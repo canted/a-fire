@@ -1,0 +1,50 @@
+# Seed the named synthetic file in Downloads and arm one POST /api/v1/uploads
+# reject-before fault before this flow. Use an isolated synthetic Note.
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible:
+      text: More tools
+      enabled: true
+    timeout: 30000
+- scrollUntilVisible:
+    element: Attach file
+    direction: DOWN
+- tapOn: Attach file
+- extendedWaitUntil:
+    visible: Downloads
+    timeout: 15000
+- tapOn: ${PICKER_FILE}
+- extendedWaitUntil:
+    visible: Insert attachment
+    timeout: 15000
+- tapOn: Insert attachment
+- extendedWaitUntil:
+    visible: Synthetic connection interruption. Retry this message.
+    timeout: 20000
+- assertVisible: ${FILE_NAME}
+- scrollUntilVisible:
+    element: Insert attachment
+    direction: DOWN
+- tapOn: Insert attachment
+- extendedWaitUntil:
+    notVisible: Insert attachment
+    timeout: 30000
+- assertNotVisible: Synthetic connection interruption. Retry this message.
+- scrollUntilVisible:
+    element: Note actions
+    direction: UP
+- tapOn: Note actions
+- tapOn: Save note
+- extendedWaitUntil:
+    visible: Saved
+    timeout: 20000
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible: Preview ${FILE_NAME}
+    timeout: 30000
+- assertVisible: Saved
+- takeScreenshot: note-file-recovered

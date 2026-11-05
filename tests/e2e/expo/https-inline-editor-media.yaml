@@ -1,0 +1,33 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/1178
+- extendedWaitUntil:
+    visible: Expo inline media parity
+    timeout: 30000
+- extendedWaitUntil:
+    visible: Synthetic inline image
+    timeout: 30000
+- assertVisible: Remove image
+- assertNotVisible: Image unavailable
+- takeScreenshot: inline-image
+- scrollUntilVisible:
+    element: Play Synthetic audio study
+    direction: DOWN
+- tapOn: Play Synthetic audio study
+- extendedWaitUntil:
+    visible: Pause Synthetic audio study
+    timeout: 30000
+- assertVisible: Remove audio
+- takeScreenshot: inline-audio
+- scrollUntilVisible:
+    element: Note actions
+    direction: UP
+- tapOn: Note actions
+- tapOn: Preview note
+- extendedWaitUntil:
+    visible: Edit note
+    timeout: 15000
+- assertNotVisible: Remove image
+- assertNotVisible: Remove audio
+- takeScreenshot: media-preview

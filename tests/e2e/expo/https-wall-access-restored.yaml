@@ -1,0 +1,8 @@
+appId: co.canted.afire.preview.localhttps
+---
+- tapOn: Retry Wall
+- extendedWaitUntil:
+    visible: Synthetic Wall contribution for Expo parity validation.
+    timeout: 30000
+- assertVisible: Open entry
+- takeScreenshot: protected-wall-restored

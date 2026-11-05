@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+exec pnpm exec prisma generate --schema server/prisma/schema.prisma "$@"

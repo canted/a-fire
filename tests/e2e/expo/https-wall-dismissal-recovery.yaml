@@ -1,0 +1,18 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2859/chat?wall=82
+- extendedWaitUntil:
+    visible: Synthetic Wall contribution for Expo parity validation.
+    timeout: 30000
+- tapOn: Back to Chat
+- extendedWaitUntil:
+    visible: Could not save the dismissal. Please try closing again.
+    timeout: 15000
+- assertVisible: Synthetic Wall contribution for Expo parity validation.
+- tapOn: Back to Chat
+- extendedWaitUntil:
+    visible: Message Expo Wall parity.*
+    timeout: 20000
+- assertNotVisible: Back to Chat
+- takeScreenshot: wall-dismissal-recovered

@@ -1,0 +1,222 @@
+.base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: var(--text-weight-medium);
+  transition: color 120ms ease, background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+.base:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.sizeXs {
+  padding: 0.05rem 0.4rem;
+  font-size: var(--text-size-2xs);
+}
+
+.sizeSm {
+  padding: 0.1rem 0.45rem;
+  font-size: var(--text-size-sm);
+}
+
+.sizeMd {
+  padding: 0.5rem 0.85rem;
+  font-size: var(--text-size-lg);
+}
+
+.sizeLg {
+  padding: 0.65rem 1rem;
+  font-size: var(--text-size-base);
+}
+
+.shapeDefault {
+  border-radius: var(--radius-md);
+}
+
+.shapePill {
+  border-radius: var(--radius-full);
+}
+
+.shapeSpeech {
+  border-radius: 0.75rem 0.75rem 0.75rem 0;
+}
+
+.shapeReply {
+  border-radius: 0 0.75rem 0.75rem 0.75rem;
+}
+
+.solid {
+  border: 1px solid transparent;
+  color: #fff;
+  box-shadow: var(--shadow-flat);
+}
+
+.solid:active {
+  box-shadow: var(--shadow-flat);
+}
+
+.solidCool {
+  background: var(--color-cool);
+}
+
+.solidCool:hover {
+  background: var(--color-cool);
+}
+
+.solidAccent {
+  background: var(--color-accent-strong);
+}
+
+.solidAccent:hover {
+  background: var(--color-accent-strong);
+}
+
+.solidPrimary {
+  background: var(--color-cool-darker);
+}
+
+.solidPrimary:hover {
+  background: var(--color-cool-darker);
+}
+
+.solidSuccess {
+  background: var(--color-success-strong);
+}
+
+.solidSuccess:hover {
+  background: var(--color-success-strong);
+}
+
+.solidDanger {
+  background: var(--color-danger-strong);
+}
+
+.solidDanger:hover {
+  background: var(--color-danger-strong);
+}
+
+.solidWarning {
+  color: var(--color-ink);
+  background: var(--color-warning-dark);
+}
+
+.solidWarning:hover {
+  background: var(--color-warning-dark);
+}
+
+.solidBright {
+  color: var(--color-ink);
+  background: var(--color-bright);
+}
+
+.solidBright:hover {
+  background: var(--color-bright);
+}
+
+.solidInk {
+  color: var(--color-surface);
+  background: var(--color-ink);
+}
+
+.solidInk:hover {
+  background: var(--color-ink);
+}
+
+.outline {
+  border: 1px solid currentColor;
+  background: var(--color-surface);
+}
+
+.outlineCool {
+  color: var(--color-cool);
+}
+
+.outlineAccent {
+  color: var(--color-accent-strong);
+}
+
+.outlinePrimary {
+  color: var(--color-cool-strong);
+}
+
+.outlineSuccess {
+  color: var(--color-success-strong);
+}
+
+.outlineDanger {
+  color: var(--color-danger-strong);
+}
+
+.outlineWarning {
+  color: var(--color-warning-dark);
+}
+
+.outlineBright {
+  color: var(--color-bright);
+}
+
+.outlineInk {
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+.ghost {
+  background: transparent;
+}
+
+.ghostCool,
+.linkCool {
+  color: var(--color-cool);
+}
+
+.ghostAccent,
+.linkAccent {
+  color: var(--color-accent-strong);
+}
+
+.ghostPrimary,
+.linkPrimary {
+  color: var(--color-cool-strong);
+}
+
+.ghostSuccess,
+.linkSuccess {
+  color: var(--color-success-strong);
+}
+
+.ghostDanger,
+.linkDanger {
+  color: var(--color-danger-strong);
+}
+
+.ghostWarning,
+.linkWarning {
+  color: var(--color-warning-dark);
+}
+
+.ghostBright,
+.linkBright {
+  color: var(--color-bright);
+}
+
+.ghostInk,
+.linkInk {
+  color: var(--color-ink);
+}
+
+.link {
+  padding-inline: 0;
+  text-decoration: underline;
+}
+
+.link:hover {
+  text-decoration: none;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+}

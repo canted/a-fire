@@ -1,0 +1,18 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: 'Rich content study'
+    timeout: 15000
+- scrollUntilVisible:
+    element:
+      text: 'Reading 20:.*'
+    direction: UP
+- takeScreenshot: mixed-history-reading-position
+- tapOn: 'Back to home'
+- openLink: ${ROOM_BASE}
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 15000
+- assertVisible: 'Reading 20:.*'
+- takeScreenshot: mixed-history-returned-position

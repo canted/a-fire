@@ -1,0 +1,26 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/${SOURCE_ID}
+- extendedWaitUntil:
+    visible: ${BODY}
+    timeout: 30000
+- scrollUntilVisible:
+    element: Note actions
+    direction: UP
+- tapOn: Note actions
+- tapOn: Move selected blocks to another Note
+- scrollUntilVisible:
+    element: ${TARGET_TITLE}
+    direction: DOWN
+- tapOn: ${TARGET_TITLE}
+- extendedWaitUntil:
+    visible: Blocks moved.
+    timeout: 15000
+- assertNotVisible: ${BODY}
+- stopApp
+- openLink: afire-local-https://app/note/${TARGET_ID}
+- extendedWaitUntil:
+    visible: ${BODY}
+    timeout: 30000
+- takeScreenshot: note-block-moved

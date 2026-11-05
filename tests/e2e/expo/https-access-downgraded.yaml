@@ -1,0 +1,24 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Continue in the mounted Room after the fixture membership is downgraded.
+- extendedWaitUntil:
+    notVisible: 'Reading 20:.*'
+    timeout: 45000
+- assertNotVisible: Load earlier messages
+- assertNotVisible: 'Reading 60:.*'
+- assertVisible: Add attachment
+- assertVisible: Message Expo access acceptance.*
+- tapOn:
+    text: Scroll to bottom
+    optional: true
+- assertVisible: 'Reading 70:.*'
+- takeScreenshot: downgraded-history
+- tapOn: Open Room details
+- extendedWaitUntil:
+    visible: Members
+    timeout: 15000
+- assertNotVisible: Start a side chat
+- assertNotVisible: Introduce members
+- takeScreenshot: visitor-details
+- tapOn: Close Room details
+- assertVisible: Message Expo access acceptance.*

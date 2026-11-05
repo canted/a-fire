@@ -1,0 +1,49 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2859/chat
+- extendedWaitUntil:
+    visible: Open Room Wall
+    timeout: 30000
+- runFlow:
+    when:
+      notVisible: Back to Chat
+    commands:
+      - tapOn: Open Room Wall
+- extendedWaitUntil:
+    visible: Synthetic Wall contribution for Expo parity validation.
+    timeout: 15000
+- takeScreenshot: published-wall
+- tapOn: Back to Chat
+- extendedWaitUntil:
+    visible: Message Expo Wall parity.*
+    timeout: 15000
+- tapOn: Open Room details
+- scrollUntilVisible:
+    element: Notifications
+    direction: DOWN
+- tapOn: Notifications
+- extendedWaitUntil:
+    visible: Notification preferences
+    timeout: 15000
+- scrollUntilVisible:
+    element: 'Expo Wall parity: Nothing \(mute\).*'
+    direction: DOWN
+- tapOn: 'Expo Wall parity: Nothing \(mute\).*'
+- extendedWaitUntil:
+    visible: 'Expo Wall parity: Nothing \(mute\), selected'
+    timeout: 15000
+- tapOn: 'Expo Wall parity: Everything'
+- extendedWaitUntil:
+    visible: 'Expo Wall parity: Everything, selected'
+    timeout: 15000
+- takeScreenshot: room-preferences
+- scrollUntilVisible:
+    element: Back
+    direction: UP
+- tapOn: Back
+- extendedWaitUntil:
+    visible: Close Room details
+    timeout: 15000
+- tapOn: Close Room details
+- assertVisible: Message Expo Wall parity.*

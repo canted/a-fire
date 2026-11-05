@@ -1,0 +1,41 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 30000
+- tapOn: '1 past reply'
+- extendedWaitUntil:
+    visible: 'An old reply remains readable.'
+    timeout: 15000
+- assertVisible: 'Historical thread source for parity'
+- assertNotVisible: 'Message Expo rich content.*'
+- takeScreenshot: historical-thread
+- tapOn: 'Back to Chat'
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 15000
+# Gesture acquisition is covered by https-message-swipe.yaml.
+- openLink: afire-local-https://app/rooms/2856/chat/messages/8177/save
+- extendedWaitUntil:
+    visible: 'Chat parity destination'
+    timeout: 15000
+- assertVisible: 'Keep a copy of Reading peer.*'
+- tapOn: 'Cancel'
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 15000
+- openLink: afire-local-https://app/rooms/2856/chat/messages/${ATTACHMENT_ID}/save
+- extendedWaitUntil:
+    visible: 'Chat parity destination'
+    timeout: 15000
+- takeScreenshot: project-picker
+- tapOn: 'Chat parity destination'
+- extendedWaitUntil:
+    visible: 'Saved to Chat parity destination.'
+    timeout: 20000
+- takeScreenshot: saved-message
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 15000

@@ -1,0 +1,27 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app
+- extendedWaitUntil:
+    visible: All rooms
+    timeout: 20000
+- tapOn: All rooms
+- assertVisible: All Rooms
+- takeScreenshot: all-rooms
+- scrollUntilVisible:
+    element: Enter Expo rich content
+    direction: DOWN
+    timeout: 60000
+    speed: 80
+- tapOn: Enter Expo rich content
+- assertVisible: Message Expo rich content.*
+- tapOn: Open Side Rooms shelf
+- assertVisible: Close Side Rooms
+- takeScreenshot: shelf-open
+- tapOn:
+    point: "3%,50%"
+- assertNotVisible: Close Side Rooms
+- assertVisible: Message Expo rich content.*
+- tapOn: Open Room details
+- assertVisible: Members
+- takeScreenshot: member-targets

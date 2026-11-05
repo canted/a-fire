@@ -1,0 +1,36 @@
+import { sessionStorage } from '../../../../frontend/src/lib/sessionStorage.web';
+import { SessionTransport } from '../../../../frontend/src/lib/api/transport';
+vi.mock('../../../../frontend/src/lib/privateMediaCache', () => ({ configurePrivateMediaCache: vi.fn(), clearPrivateMediaCache: vi.fn() }));
+const tokens = (sub: string, revision = 1) => ({ accessToken: `header.${btoa(JSON.stringify({ sub, revision }))}.signature`, refreshToken: `refresh-${revision}` });
+const change = (oldValue: unknown, newValue: unknown) => window.dispatchEvent(new StorageEvent('storage', { key: 'afire.preview.session', storageArea: localStorage, oldValue: oldValue ? JSON.stringify(oldValue) : null, newValue: newValue ? JSON.stringify(newValue) : null }));
+afterEach(() => vi.unstubAllGlobals());
+it('notifies the canonical session owner of logout and account changes, preserving same-user refresh drafts', () => {
+  const changed = vi.fn();
+  const client = new SessionTransport('https://example.test/api', sessionStorage, changed);
+  const stop = client.observeExternalSession();
+  change(tokens('1'), tokens('1', 2));
+  expect(changed).toHaveBeenLastCalledWith(tokens('1', 2), false);
+  change(tokens('1'), tokens('2'));
+  expect(changed).toHaveBeenLastCalledWith(tokens('2'), true);
+  change(tokens('2'), null);
+  expect(changed).toHaveBeenLastCalledWith(null, true);
+  stop();
+  changed.mockClear();
+  change(null, tokens('1'));
+  expect(changed).not.toHaveBeenCalled();
+});
+it('rejects a pending private response after another tab signs out', async () => {
+  await sessionStorage.write(tokens('1'));
+  const client = new SessionTransport('https://example.test/api', sessionStorage);
+  const stop = client.observeExternalSession();
+  let finish!: (response: Response) => void;
+  vi.stubGlobal('fetch', vi.fn(() => new Promise<Response>(resolve => { finish = resolve; })));
+  const pending = client.get('/v1/projects');
+  const assertion = expect(pending).rejects.toMatchObject({ status: 401 });
+  await vi.waitFor(() => expect(finish).toBeTypeOf('function'));
+  change(tokens('1'), null);
+  finish(new Response('{}'));
+  await assertion;
+  stop();
+  localStorage.clear();
+});

@@ -1,0 +1,99 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Parameters are IDs from the guarded destination fixture, never production IDs.
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible: Note title.*
+    timeout: 30000
+- assertVisible: ${NOTE_BODY}
+- tapOn: Preview note
+- assertVisible: ${NOTE_BODY}
+- takeScreenshot: note-preview
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- runFlow:
+    when:
+      visible: Join the round
+    commands:
+      - tapOn: Join the round
+- extendedWaitUntil:
+    visible: Pin up an entry
+    timeout: 15000
+- tapOn: Pin up an entry
+- scrollUntilVisible:
+    element: Create a new entry
+    direction: DOWN
+- tapOn: Create a new entry
+- extendedWaitUntil:
+    visible: Entry title.*
+    timeout: 15000
+- tapOn: Entry title.*
+- inputText: Native parity title
+- hideKeyboard
+- scrollUntilVisible:
+    element:
+      text: Note and entry text
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    text: Note and entry text
+    retryTapIfNoChange: false
+- inputText: Synthetic native destination contribution.
+- runFlow:
+    when:
+      platform: iOS
+      visible: Done
+    commands:
+      - tapOn: Done
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- scrollUntilVisible:
+    element: Save draft and close
+    direction: DOWN
+- tapOn: Save draft and close
+- extendedWaitUntil:
+    notVisible: Save draft and close
+    timeout: 15000
+- scrollUntilVisible:
+    element: Pin up an entry
+    direction: UP
+- tapOn: Pin up an entry
+- scrollUntilVisible:
+    element: Create a new entry
+    direction: DOWN
+- tapOn: Create a new entry
+- assertVisible: Native parity title
+- assertVisible: Synthetic native destination contribution.
+- takeScreenshot: round-draft-restored
+- scrollUntilVisible:
+    element: Save draft and close
+    direction: DOWN
+- tapOn: Save draft and close
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room Settings
+    timeout: 30000
+- assertVisible: You do not have permission to manage this Room.
+- assertNotVisible: Room name.*
+- takeScreenshot: member-settings-denied
+- stopApp
+- openLink: afire-local-https://app/rooms/${HOST_ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room name.*
+    timeout: 30000
+- takeScreenshot: room-settings
+- stopApp
+- openLink: afire-local-https://app/rooms/${HOST_ROOM_ID}/invites
+- extendedWaitUntil:
+    visible: Invite email or person.*
+    timeout: 30000
+- assertVisible: Send Room invite
+- takeScreenshot: room-invites

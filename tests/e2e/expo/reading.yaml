@@ -1,0 +1,29 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: "Rooms|Message .*"
+    timeout: 30000
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: "Reading 20: A short creative update."
+    timeout: 30000
+- assertVisible: "Scroll to bottom"
+- takeScreenshot: reading-target
+- tapOn: "Back to home"
+- extendedWaitUntil:
+    visible: "Rooms"
+    timeout: 10000
+- tapOn:
+    text: "Expo reading parity"
+    index: 0
+- extendedWaitUntil:
+    visible: "Reading 20: A short creative update."
+    timeout: 10000
+- takeScreenshot: reading-restored
+- tapOn: "Scroll to bottom"
+- extendedWaitUntil:
+    visible: ${LATEST_MESSAGE}
+    timeout: 10000
+- takeScreenshot: reading-latest

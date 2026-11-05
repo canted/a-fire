@@ -1,0 +1,30 @@
+# Run after https-note-save-failure; arm one GET /api/v2/notes/${NOTE_ID} reject-before fault.
+appId: co.canted.afire.preview.localhttps
+---
+- pressKey: home
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: Retry note
+    timeout: 45000
+- assertVisible: ${EXPECTED_BODY}
+- takeScreenshot: retained-note-after-refresh-failure
+- tapOn: Retry note
+- extendedWaitUntil:
+    notVisible: Retry note
+    timeout: 20000
+- assertVisible: ${EXPECTED_BODY}
+- scrollUntilVisible:
+    element: Note actions
+    direction: UP
+- tapOn: Note actions
+- tapOn: Save note
+- extendedWaitUntil:
+    visible: Saved
+    timeout: 20000
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible: ${EXPECTED_BODY}
+    timeout: 30000
+- takeScreenshot: recovered-note-reopened

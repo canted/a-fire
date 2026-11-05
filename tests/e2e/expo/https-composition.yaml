@@ -1,0 +1,29 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 20000
+- tapOn: 'Message Expo rich content.*'
+- inputText: 'Synthetic ${PLATFORM} mention @read'
+- assertVisible: 'Synthetic ${PLATFORM} mention @read'
+- extendedWaitUntil:
+    visible: 'Mention Reading peer.*'
+    timeout: 10000
+- takeScreenshot: mention-suggestions
+- tapOn: 'Mention Reading peer.*'
+- assertVisible: 'Synthetic ${PLATFORM} mention @Reading peer.*'
+- tapOn: 'Send'
+- extendedWaitUntil:
+    notVisible: 'Send'
+    timeout: 15000
+- assertVisible: 'Synthetic ${PLATFORM} mention.*Reading peer.*'
+- takeScreenshot: sent-mention
+- tapOn: 'Add attachment'
+- assertVisible: 'Camera'
+- assertVisible: 'Choose photo or file'
+- assertVisible: 'Record audio'
+- takeScreenshot: attachment-choices
+- tapOn: 'Cancel'
+- assertNotVisible: 'Choose photo or file'

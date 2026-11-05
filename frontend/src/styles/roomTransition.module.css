@@ -1,0 +1,23 @@
+/* Keep the complete snapshot selector global: CSS Modules must not rename the
+   browser-owned `root` view-transition name (Metro/Lightning CSS scopes it).
+   The route snapshot moves as one screen; detail fragments must not detach. */
+:global(html[data-room-details-transition]) * { view-transition-name: none !important; }
+:global(html[data-room-details-transition])::view-transition-group(*) { animation-duration: 360ms; }
+:global(html[data-room-details-transition]::view-transition-old(root)) { mix-blend-mode: normal; }
+:global(html[data-room-details-transition]::view-transition-new(root)) { mix-blend-mode: normal; }
+:global(html[data-room-details-transition="deeper"]::view-transition-old(root)) { animation: room-out-up-left 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+:global(html[data-room-details-transition="from-home"]::view-transition-new(root)) { animation: room-in-down-right 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+:global(html[data-room-details-transition="deeper"]::view-transition-new(root)) { animation: room-in-down-right 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+:global(html[data-room-details-transition="shallower"]::view-transition-old(root)) { animation: room-out-down-right 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+:global(html[data-room-details-transition="shallower"]::view-transition-new(root)) { animation: room-in-up-left 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+:global(html[data-room-details-transition="home"]::view-transition-old(root)) { animation: room-out-down-right 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+:global(html[data-room-details-transition="home"]::view-transition-new(root)) { animation: room-home-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: center; }
+:global(html[data-room-details-transition="from-home"]::view-transition-old(root)) { animation: room-home-out 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes room-out-up-left { to { transform: translate(-100%, -100%); } }
+@keyframes room-in-down-right { from { transform: translate(100%, 100%); } }
+@keyframes room-out-down-right { to { transform: translate(100%, 100%); opacity: 0; } }
+@keyframes room-in-up-left { from { transform: translate(-100%, -100%); } }
+@keyframes room-home-out { to { transform: translate(-100%, -100%); opacity: 0; } }
+@keyframes room-home-in { from { transform: translate(-100%, -100%); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) { :global(html[data-room-details-transition]::view-transition-old(root)) { animation: none; } :global(html[data-room-details-transition]::view-transition-new(root)) { animation: none; } }

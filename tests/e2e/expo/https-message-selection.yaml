@@ -1,0 +1,17 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat?message=8177
+- extendedWaitUntil:
+    visible: Historical thread source for parity
+    timeout: 30000
+- extendedWaitUntil:
+    notVisible: Finding message.*
+    timeout: 15000
+- longPressOn: Historical thread source for parity
+- extendedWaitUntil:
+    visible: '(?i)Copy'
+    timeout: 10000
+- takeScreenshot: native-message-text-selection
+- tapOn: '(?i)Copy'
+- assertNotVisible: Save revealed message 8177 to project

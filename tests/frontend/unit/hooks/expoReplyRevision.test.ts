@@ -1,0 +1,38 @@
+vi.mock("../../../../frontend/src/lib/chatFiles", () => ({ releaseChatFile: vi.fn() }));
+vi.mock("../../../../frontend/node_modules/react-native", () => ({ AppState: { addEventListener: () => ({ remove() {} }) } }));
+import { afterEach, expect, it, vi } from "vitest";
+import type { Root } from "react-dom/client";
+const mocks = vi.hoisted(() => ({ create: vi.fn(), update: vi.fn(), publish: vi.fn() }));
+vi.mock("../../../../frontend/src/lib/api", () => ({ client: {} }));
+vi.mock("../../../../frontend/src/lib/api/entries", () => ({ createReply: mocks.create, updateReply: mocks.update, publishReply: mocks.publish }));
+vi.mock("../../../../frontend/src/hooks/useMentionTargets", () => ({ useMentionTargets: () => [] }));
+vi.mock("../../../../frontend/src/hooks/useAttachmentUpload", () => ({ useAttachmentUpload: () => ({ trigger: vi.fn() }) }));
+vi.mock("../../../../frontend/src/hooks/useEntryQuery", () => ({ useEntryQuery: vi.fn() }));
+const expo = "../../../../frontend";
+const { act, createElement } = await import(`${expo}/node_modules/react/index.js`) as typeof import("react");
+const { createRoot } = await import(`${expo}/node_modules/react-dom/client.js`) as typeof import("react-dom/client");
+const { SWRConfig } = await import(`${expo}/node_modules/swr/dist/index/index.mjs`);
+const { useEntryComposition } = await import(`${expo}/src/hooks/useEntryReplies.ts`);
+let root: Root;
+afterEach(async () => { await act(async () => root?.unmount()); vi.resetAllMocks(); });
+it("retries uncertain publication with the original revision and preserves text on conflict", async () => {
+  Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
+  let state: any = { text: "My reply", mentions: [], revision: 0, pending: null };
+  const draft = { read: () => state, update: (value: any) => { state = { ...state, ...(typeof value === "function" ? value(state) : value) }; } };
+  mocks.create.mockResolvedValue({ id: 71, revision: 100 });
+  mocks.publish.mockRejectedValueOnce(new Error("Connection lost")).mockRejectedValueOnce(new Error("This reply changed elsewhere"));
+  let result!: ReturnType<typeof useEntryComposition>;
+  function Probe() { result = useEntryComposition("42", "4", draft as never, { entry: { mutate: vi.fn().mockResolvedValue(undefined) } } as never, true); return null; }
+  root = createRoot(document.createElement("div"));
+  await act(async () => root.render(createElement(SWRConfig, { value: { provider: () => new Map() } }, createElement(Probe))));
+  await act(async () => result.send());
+  expect(mocks.update).not.toHaveBeenCalled();
+  expect(mocks.publish).toHaveBeenCalledWith({}, "42", 71, expect.objectContaining({ expected_revision: 100 }));
+  expect(state.staging.serverRevision).toBe(100);
+  await act(async () => result.send());
+  expect(mocks.publish.mock.calls[1]).toEqual(mocks.publish.mock.calls[0]);
+  expect(mocks.create).toHaveBeenCalledOnce();
+  expect(mocks.publish).toHaveBeenCalledTimes(2);
+  expect(state.text).toBe("My reply");
+  expect(result.error).toBe("This reply changed elsewhere");
+});

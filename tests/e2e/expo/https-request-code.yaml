@@ -1,0 +1,50 @@
+appId: co.canted.afire.preview.localhttps
+---
+- launchApp
+- extendedWaitUntil:
+    visible: "Email address|Verification code|Rooms|Back to home"
+    timeout: 30000
+- runFlow:
+    when:
+      visible: Verification code
+    commands:
+      - tapOn: Start over
+- runFlow:
+    when:
+      visible: Back to home
+    commands:
+      - tapOn: Back to home
+- runFlow:
+    when:
+      visible: Rooms
+    commands:
+      - tapOn: Your profile
+      - tapOn: Sign out
+- extendedWaitUntil:
+    visible: Email address
+    timeout: 30000
+- runFlow:
+    when:
+      true: ${typeof ROOM_LINK !== 'undefined' && ROOM_LINK !== ''}
+    commands:
+      - stopApp
+      - openLink: ${ROOM_LINK}
+      - repeat:
+          times: 2
+          commands:
+            - tapOn:
+                text: Open
+                optional: true
+      - assertVisible: Email address
+- tapOn: Email address
+- eraseText
+- inputText: "${typeof EMAIL === 'undefined' ? 'expo-pilot@example.test' : EMAIL}"
+# Android may already have hidden its IME; an unconditional Back can leave the app.
+# Continue is reachable with the keyboard open and dismisses it on submission.
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - hideKeyboard
+- tapOn: Continue
+- assertVisible: Verification code

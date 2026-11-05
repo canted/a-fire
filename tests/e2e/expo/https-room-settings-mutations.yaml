@@ -1,0 +1,73 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room name.*
+    timeout: 30000
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - longPressOn: Room name.*
+      - tapOn: Select [Aa]ll
+      - eraseText: 1
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      # The fixture name fits on one line; tapping beyond its text puts the
+      # insertion point at the end before Maestro sends backward deletes.
+      - tapOn:
+          point: 94%, 24%
+      - eraseText: 100
+- inputText: ${TEST_NAME}
+- hideKeyboard
+- tapOn: Save changes
+- extendedWaitUntil:
+    visible: Saved.
+    timeout: 15000
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: ${TEST_NAME}
+    timeout: 30000
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - longPressOn: Room name.*
+      - tapOn: Select [Aa]ll
+      - eraseText: 1
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      # The fixture name fits on one line; tapping beyond its text puts the
+      # insertion point at the end before Maestro sends backward deletes.
+      - tapOn:
+          point: 94%, 24%
+      - eraseText: 100
+- inputText: ${ORIGINAL_NAME}
+- hideKeyboard
+- tapOn: Save changes
+- extendedWaitUntil:
+    visible: Saved.
+    timeout: 15000
+- takeScreenshot: room-name-restored
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/invites
+- extendedWaitUntil:
+    visible: Invite email or person.*
+    timeout: 30000
+- tapOn: Invite email or person.*
+- inputText: ${INVITE_EMAIL}
+- hideKeyboard
+- tapOn: Send Room invite
+- extendedWaitUntil:
+    visible: Invitation created. Email delivery is pending.
+    timeout: 15000
+- scrollUntilVisible:
+    element: ${INVITE_EMAIL}
+    direction: DOWN
+- takeScreenshot: synthetic-invite-sent

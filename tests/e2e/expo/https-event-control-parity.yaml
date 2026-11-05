@@ -1,0 +1,38 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat/messages/8177/save
+- extendedWaitUntil:
+    visible: Chat parity destination
+    timeout: 30000
+- assertVisible: Close save to project
+- takeScreenshot: save-close-icon
+- tapOn: Close save to project
+- assertVisible: Message Expo rich content.*
+- openLink: afire-local-https://app/rooms/2859/chat
+- extendedWaitUntil:
+    visible: 'View round: Expo destination test Round'
+    timeout: 30000
+- tapOn:
+    text: 'View round: Expo destination test Round'
+    index: 0
+- extendedWaitUntil:
+    visible: Back to rounds
+    timeout: 15000
+- assertVisible: Submissions
+- takeScreenshot: round-event-destination
+- tapOn: Back to rounds
+- extendedWaitUntil:
+    visible: Back to room chat
+    timeout: 15000
+- tapOn: Back to room chat
+- extendedWaitUntil:
+    visible: 'View wall: Synthetic Room Wall'
+    timeout: 15000
+- tapOn: 'View wall: Synthetic Room Wall'
+- extendedWaitUntil:
+    visible: "web benchmark's entry"
+    timeout: 15000
+- takeScreenshot: wall-event-destination
+- tapOn: Back to Chat
+- assertVisible: Message Expo Wall parity.*

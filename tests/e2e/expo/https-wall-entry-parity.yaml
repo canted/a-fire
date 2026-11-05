@@ -1,0 +1,50 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2859/chat?wall=82
+- extendedWaitUntil:
+    visible: "web benchmark's entry"
+    timeout: 30000
+- takeScreenshot: wall-gallery
+- tapOn: "web benchmark's entry"
+- extendedWaitUntil:
+    visible: Feedback
+    timeout: 15000
+- assertVisible: Synthetic Wall contribution for Expo parity validation.
+- assertVisible: Message this entry.*
+- tapOn: Message this entry.*
+- inputText: ${REPLY_TEXT}
+- tapOn: Send
+- extendedWaitUntil:
+    visible: ${REPLY_TEXT}
+    timeout: 15000
+- takeScreenshot: wall-entry
+- tapOn: Back to wall
+- assertVisible: "web benchmark's entry"
+- scrollUntilVisible:
+    element: "Gallery contributor 07's entry"
+    direction: DOWN
+- tapOn: "Gallery contributor 07's entry"
+- extendedWaitUntil:
+    visible: Feedback
+    timeout: 15000
+- tapOn: Back to wall
+- assertVisible: "Gallery contributor 07's entry"
+- takeScreenshot: gallery-position-restored
+- scrollUntilVisible:
+    element: Previous wall
+    direction: DOWN
+- tapOn: Previous wall
+- extendedWaitUntil:
+    visible: Entry no longer available.
+    timeout: 15000
+- assertNotVisible: "web benchmark's entry"
+- tapOn: Next wall
+- extendedWaitUntil:
+    visible: "Gallery contributor 07's entry"
+    timeout: 15000
+- assertVisible: View ongoing round
+- tapOn: Back to Chat
+- extendedWaitUntil:
+    visible: Message Expo Wall parity.*
+    timeout: 15000

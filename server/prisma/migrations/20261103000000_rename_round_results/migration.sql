@@ -1,0 +1,23 @@
+-- Rename stored Round results; Wall remains the presentation terminology.
+BEGIN;
+ALTER TABLE "published_walls" RENAME TO "round_results";
+ALTER TABLE "wall_entries" RENAME TO "round_result_entries";
+ALTER TABLE "wall_presentations" RENAME TO "round_result_presentations";
+ALTER TABLE "round_result_entries" RENAME COLUMN "wall_id" TO "round_result_id";
+ALTER TABLE "round_result_presentations" RENAME COLUMN "wall_id" TO "round_result_id";
+ALTER TABLE "round_results" RENAME CONSTRAINT "published_walls_pkey" TO "round_results_pkey";
+ALTER SEQUENCE "published_walls_id_seq" RENAME TO "round_results_id_seq";
+ALTER TABLE "round_result_entries" RENAME CONSTRAINT "wall_entries_pkey" TO "round_result_entries_pkey";
+ALTER SEQUENCE "wall_entries_id_seq" RENAME TO "round_result_entries_id_seq";
+ALTER TABLE "round_result_presentations" RENAME CONSTRAINT "wall_presentations_pkey" TO "round_result_presentations_pkey";
+ALTER INDEX "published_walls_round_id_key" RENAME TO "round_results_round_id_key";
+ALTER INDEX "published_walls_room_id_published_at_id_idx" RENAME TO "round_results_room_id_published_at_id_idx";
+ALTER INDEX "wall_entries_wall_id_position_key" RENAME TO "round_result_entries_round_result_id_position_key";
+ALTER INDEX "wall_entries_wall_id_entry_id_key" RENAME TO "round_result_entries_round_result_id_entry_id_key";
+ALTER TABLE "round_results" RENAME CONSTRAINT "published_walls_round_id_fkey" TO "round_results_round_id_fkey";
+ALTER TABLE "round_results" RENAME CONSTRAINT "published_walls_room_id_fkey" TO "round_results_room_id_fkey";
+ALTER TABLE "round_result_entries" RENAME CONSTRAINT "wall_entries_wall_id_fkey" TO "round_result_entries_round_result_id_fkey";
+ALTER TABLE "round_result_entries" RENAME CONSTRAINT "wall_entries_entry_id_fkey" TO "round_result_entries_entry_id_fkey";
+ALTER TABLE "round_result_presentations" RENAME CONSTRAINT "wall_presentations_wall_id_fkey" TO "round_result_presentations_round_result_id_fkey";
+ALTER TABLE "round_result_presentations" RENAME CONSTRAINT "wall_presentations_user_id_fkey" TO "round_result_presentations_user_id_fkey";
+COMMIT;

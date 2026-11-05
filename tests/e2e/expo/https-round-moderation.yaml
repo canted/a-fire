@@ -1,0 +1,55 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}?view=manage
+- extendedWaitUntil:
+    visible: View Round
+    timeout: 30000
+- scrollUntilVisible:
+    element: Remove cover by ${MEMBER_NAME}
+    direction: DOWN
+- tapOn: Remove cover by ${MEMBER_NAME}
+- scrollUntilVisible:
+    element: Cover removal note
+    direction: DOWN
+- scrollUntilVisible:
+    element: Confirm remove cover
+    direction: DOWN
+- assertVisible:
+    text: Confirm remove cover
+    enabled: false
+- tapOn: Cancel removal
+- scrollUntilVisible:
+    element: Remove cover by ${MEMBER_NAME}
+    direction: UP
+- tapOn: Remove cover by ${MEMBER_NAME}
+- scrollUntilVisible:
+    element: Cover removal note
+    direction: DOWN
+- tapOn: Cover removal note
+- inputText: Synthetic moderation recovery check.
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - hideKeyboard
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - pressKey: Enter
+- scrollUntilVisible:
+    element: Confirm remove cover
+    direction: DOWN
+- tapOn: Confirm remove cover
+- scrollUntilVisible:
+    element: Remind ${MEMBER_NAME}
+    direction: UP
+- tapOn: Remind ${MEMBER_NAME}
+- extendedWaitUntil:
+    visible: Reminder sent to ${MEMBER_NAME}
+    timeout: 20000
+- assertVisible:
+    text: Reminder sent to ${MEMBER_NAME}
+    enabled: false
+- takeScreenshot: moderated-cover-and-reminder

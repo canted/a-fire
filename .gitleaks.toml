@@ -1,0 +1,16 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Development script command, not an API credential"
+condition = "AND"
+paths = ['''^package\.json$''']
+regexTarget = "line"
+regexes = ['''"dev:api": "TSX_DISABLE_IPC=1 tsx --tsconfig tsconfig\.server\.json server/main\.ts"''']
+
+[[allowlists]]
+description = "Unsigned browser fixture token; requests are intercepted by Playwright"
+condition = "AND"
+paths = ['''^tests/e2e/layout/layoutFixtures\.ts$''']
+regexTarget = "line"
+regexes = ['''eyJhbGciOiJub25lIn0\..*btoa.*fixture-refresh''']

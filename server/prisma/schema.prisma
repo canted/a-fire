@@ -1,0 +1,1234 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator factory {
+  provider = "prisma-factory"
+  output   = "../../tests/e2e/factories/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                           Int                        @id @default(autoincrement())
+  email                        String                     @unique @db.VarChar
+  encrypted_password           String                     @default("") @db.VarChar
+  reset_password_token         String?                    @db.VarChar
+  reset_password_sent_at       DateTime?                  @db.Timestamp(6)
+  remember_created_at          DateTime?                  @db.Timestamp(6)
+  username                     String                     @db.VarChar
+  profile_line                 String?                    @db.VarChar(160)
+  created_at                   DateTime                   @map("created_at") @db.Timestamp(6)
+  updated_at                   DateTime                   @map("updated_at") @db.Timestamp(6)
+  last_seen_at                 DateTime?                  @db.Timestamp(6)
+  notify_by_the                Int?
+  notified_at                  DateTime?                  @db.Timestamp(6)
+  rooms                        Room[]                     @relation("RoomOwner")
+  room_visits                  RoomVisit[]
+  memberships                  RoomMembership[]
+  invites                      Invite[]                   @relation("InviteSender")
+  notification_events          NotificationEvent[]        @relation("NotificationActor")
+  notification_targets         NotificationEvent[]        @relation("NotificationTarget")
+  chat_message_reads           ChatMessageRead[]
+  notification_inbox_items     NotificationInboxItem[]
+  notification_push_deliveries NotificationPushDelivery[]
+  entry_view_states            EntryViewState[]
+  round_result_presentations   RoundResultPresentation[]
+  notice_cursor                UserNoticeCursor?
+  notification_preferences     NotificationPreference[]
+  created_introductions        Introduction[]             @relation("IntroductionCreator")
+  retracted_introductions      Introduction[]             @relation("IntroductionRetractor")
+  introduction_recipients      IntroductionRecipient[]
+  tokens                       OneTimeToken[]
+  room_banners                 RoomBanner[]               @relation("RoomBannerCreator")
+  room_banner_targets          RoomBannerTarget[]
+  entries                      Entry[]
+  replies                      Reply[]
+  reflections                  Reflection[]
+  roles                        Role[]
+  audio_assets                 AudioAsset[]
+  video_assets                 VideoAsset[]
+  audio_annotations            AudioAnnotation[]          @relation("AudioAnnotationCreator")
+  chat_messages                ChatMessage[]              @relation("ChatMessageAuthor")
+  chat_messages_saved          ChatMessage[]              @relation("ChatMessageSaver")
+  chat_messages_pinned         ChatMessage[]              @relation("ChatMessagePinner")
+  chat_identity_grants         ChatMessageIdentityGrant[]
+  chat_presence_sessions       ChatPresenceSession[]
+  chat_save_requests_created   ChatSaveRequest[]          @relation("ChatSaveRequestRequester")
+  chat_save_requests_received  ChatSaveRequest[]          @relation("ChatSaveRequestOwner")
+  room_join_requests           RoomJoinRequest[]          @relation("RoomJoinRequester")
+  room_join_requests_reviewed  RoomJoinRequest[]          @relation("RoomJoinReviewer")
+  room_invitations_received    RoomMemberInvitation[]     @relation("RoomInvitationRecipient")
+  room_invitations_sent        RoomMemberInvitation[]     @relation("RoomInvitationSender")
+  room_knocks                  RoomKnock[]                @relation("RoomKnocker")
+  room_knocks_reviewed         RoomKnock[]                @relation("RoomKnockReviewer")
+  chat_note_copies             ChatNoteCopy[]
+  hosted_activities            Round[]                 @relation("ActivityHost")
+  activity_participations      ActivityParticipation[]
+  activity_submission_records  ActivitySubmission[]
+  activity_activity_artifacts  ActivityArtifact[]
+  activity_activity_offers     ActivityOffer[]
+  activity_activity_moderation ActivityModerationEvent[]  @relation("ActivityModerator")
+  owned_projects               Project[]                  @relation("ProjectOwner")
+  project_participations       ProjectParticipation[]     @relation("ProjectParticipant")
+  project_invitations_sent     ProjectParticipation[]     @relation("ProjectInviter")
+
+  @@map("users")
+}
+
+model Room {
+  id                     Int                    @id @default(autoincrement())
+  name                   String?                @db.VarChar
+  owner_id               Int?                   @map("owner_id")
+  parent_id              Int?                   @map("parent_id")
+  porosity               String                 @default("open") @db.VarChar
+  created_at             DateTime               @map("created_at") @db.Timestamp(6)
+  updated_at             DateTime               @map("updated_at") @db.Timestamp(6)
+  deleted_at             DateTime?              @db.Timestamp(6)
+  reply_mode             String                 @default("simple") @db.VarChar
+  default_feedback_types Json                   @default("[\"impression\",\"question\",\"idea\"]") @db.Json
+  default_idea_guidance  String                 @default("open") @db.VarChar
+  owner                  User?                  @relation("RoomOwner", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parent                 Room?                  @relation("RoomTree", fields: [parent_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  children               Room[]                 @relation("RoomTree")
+  memberships            RoomMembership[]
+  banners                RoomBanner[]
+  notification_events    NotificationEvent[]
+  introductions          Introduction[]
+  invites                Invite[]
+  chat_messages          ChatMessage[]
+  chat_presence_sessions ChatPresenceSession[]
+  rounds             Round[]
+  round_results        RoundResult[]
+  projects               ProjectRoom[]
+  join_requests          RoomJoinRequest[]
+  member_invitations     RoomMemberInvitation[]
+  knocks                 RoomKnock[]
+  visits                 RoomVisit[]
+
+  @@index([parent_id, porosity, id], map: "index_rooms_on_parent_porosity")
+  @@map("rooms")
+}
+
+model ChatMessage {
+  id              Int                        @id @default(autoincrement())
+  room_id         Int                        @map("room_id")
+  author_id       Int                        @map("author_id")
+  saved_by_id     Int?                       @map("saved_by_id")
+  pinned_by_id    Int?                       @map("pinned_by_id")
+  entry_id        Int?                       @unique(map: "index_chat_messages_on_entry") @map("entry_id")
+  status          String                     @default("published") @db.VarChar
+  timeline_kind   String                     @default("message") @map("timeline_kind") @db.VarChar
+  entry_origin    String?                    @map("entry_origin") @db.VarChar
+  saved_at        DateTime?                  @map("saved_at") @db.Timestamp(6)
+  pinned_at       DateTime?                  @map("pinned_at") @db.Timestamp(6)
+  body            String                     @db.Text
+  content         Json?                      @db.Json
+  masked_alias    String                     @map("masked_alias") @db.VarChar
+  client_nonce    String?                    @map("client_nonce") @db.VarChar(64)
+  fire_at         DateTime                   @map("fire_at") @db.Timestamp(6)
+  expires_at      DateTime                   @map("expires_at") @db.Timestamp(6)
+  created_at      DateTime                   @map("created_at") @db.Timestamp(6)
+  updated_at      DateTime                   @map("updated_at") @db.Timestamp(6)
+  room            Room                       @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  author          User                       @relation("ChatMessageAuthor", fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  saved_by        User?                      @relation("ChatMessageSaver", fields: [saved_by_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  pinned_by       User?                      @relation("ChatMessagePinner", fields: [pinned_by_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  entry           Entry?                     @relation(fields: [entry_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  replies         Reply[]
+  read_receipts   ChatMessageRead[]
+  identity_grants ChatMessageIdentityGrant[]
+  save_requests   ChatSaveRequest[]
+  note_copies     ChatNoteCopy[]
+
+  @@unique([author_id, client_nonce], map: "index_chat_messages_on_author_nonce")
+  @@index([room_id, created_at, id], map: "index_chat_messages_on_room_created")
+  @@index([room_id, status, pinned_at, id], map: "index_chat_messages_on_room_status_pinned")
+  @@index([room_id, expires_at], map: "index_chat_messages_on_room_expires")
+  @@map("chat_messages")
+}
+
+model ChatMessageRead {
+  user_id    Int
+  message_id Int
+  seen_at    DateTime    @default(now()) @db.Timestamp(6)
+  user       User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  message    ChatMessage @relation(fields: [message_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, message_id])
+  @@map("chat_message_reads")
+}
+
+model ChatMessageIdentityGrant {
+  id         Int         @id @default(autoincrement())
+  message_id Int         @map("message_id")
+  user_id    Int         @map("user_id")
+  created_at DateTime    @map("created_at") @db.Timestamp(6)
+  message    ChatMessage @relation(fields: [message_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user       User        @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([message_id, user_id], map: "index_chat_identity_grants_on_message_user")
+  @@index([user_id, message_id], map: "index_chat_identity_grants_on_user_message")
+  @@map("chat_message_identity_grants")
+}
+
+model ChatPresenceSession {
+  id            Int       @id @default(autoincrement())
+  room_id       Int       @map("room_id")
+  user_id       Int       @map("user_id")
+  connection_id String    @map("connection_id") @db.VarChar
+  entered_at    DateTime  @map("entered_at") @db.Timestamp(6)
+  last_seen_at  DateTime  @map("last_seen_at") @db.Timestamp(6)
+  left_at       DateTime? @map("left_at") @db.Timestamp(6)
+  room          Room      @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user          User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([room_id, connection_id], map: "index_chat_presence_on_room_connection")
+  @@index([room_id, left_at, last_seen_at], map: "index_chat_presence_on_room_active")
+  @@index([user_id, left_at], map: "index_chat_presence_on_user_active")
+  @@map("chat_presence_sessions")
+}
+
+model ChatSaveRequest {
+  id           Int         @id @default(autoincrement())
+  message_id   Int         @map("message_id")
+  requester_id Int         @map("requester_id")
+  owner_id     Int         @map("owner_id")
+  status       String      @default("pending") @db.VarChar
+  created_at   DateTime    @map("created_at") @db.Timestamp(6)
+  updated_at   DateTime    @map("updated_at") @db.Timestamp(6)
+  message      ChatMessage @relation(fields: [message_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  requester    User        @relation("ChatSaveRequestRequester", fields: [requester_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  owner        User        @relation("ChatSaveRequestOwner", fields: [owner_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([message_id, requester_id], map: "index_chat_save_requests_on_message_requester")
+  @@index([owner_id, status, created_at], map: "index_chat_save_requests_on_owner_status")
+  @@map("chat_save_requests")
+}
+
+model RoomMembership {
+  id                    Int       @id @default(autoincrement())
+  room_id               Int       @map("room_id")
+  user_id               Int       @map("user_id")
+  notify                Boolean?  @default(true)
+  created_at            DateTime  @map("created_at") @db.Timestamp(6)
+  updated_at            DateTime  @map("updated_at") @db.Timestamp(6)
+  unseen_started_at     DateTime  @default(now()) @map("unseen_started_at") @db.Timestamp(6)
+  username_override     String?   @map("username_override") @db.VarChar
+  profile_line_override String?   @map("profile_line_override") @db.VarChar(160)
+  disabled              Boolean   @default(false)
+  revoked_at            DateTime? @db.Timestamp(6)
+  room                  Room      @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                  User      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([room_id, user_id], map: "index_room_memberships_on_room_user")
+  @@index([room_id, disabled, revoked_at, created_at, id], map: "index_membership_history_seek")
+  @@index([user_id, disabled, room_id], map: "index_room_memberships_on_user_active_room")
+  @@map("room_memberships")
+}
+
+// Source rows preserve every value removed during duplicate reconciliation.
+// No live foreign keys: historical evidence must survive later account/Room lifecycle changes.
+model RoomMembershipReconciliation {
+  id                      Int      @id @default(autoincrement())
+  room_id                 Int      @map("room_id")
+  user_id                 Int
+  canonical_membership_id Int
+  source_records          Json
+  conflicting_fields      String[]
+  review_status           String
+  created_at              DateTime @default(now()) @db.Timestamp(6)
+
+  @@unique([room_id, user_id], map: "index_membership_reconciliations_on_room_user")
+  @@index([review_status, id], map: "index_membership_reconciliations_on_review_status")
+  @@map("room_membership_reconciliations")
+}
+
+model RoomJoinRequest {
+  id             Int       @id @default(autoincrement())
+  room_id        Int       @map("room_id")
+  user_id        Int       @map("user_id")
+  status         String    @default("pending") @db.VarChar
+  reviewed_by_id Int?      @map("reviewed_by_id")
+  reviewed_at    DateTime? @map("reviewed_at") @db.Timestamp(6)
+  created_at     DateTime  @map("created_at") @db.Timestamp(6)
+  updated_at     DateTime  @map("updated_at") @db.Timestamp(6)
+  room           Room      @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user           User      @relation("RoomJoinRequester", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reviewed_by    User?     @relation("RoomJoinReviewer", fields: [reviewed_by_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@unique([room_id, user_id], map: "index_room_join_requests_on_room_user")
+  @@index([room_id, status, created_at], map: "index_room_join_requests_on_room_status")
+  @@map("room_join_requests")
+}
+
+model RoomMemberInvitation {
+  id            Int       @id @default(autoincrement())
+  room_id       Int       @map("room_id")
+  user_id       Int       @map("user_id")
+  invited_by_id Int       @map("invited_by_id")
+  status        String    @default("pending") @db.VarChar
+  responded_at  DateTime? @map("responded_at") @db.Timestamp(6)
+  created_at    DateTime  @map("created_at") @db.Timestamp(6)
+  updated_at    DateTime  @map("updated_at") @db.Timestamp(6)
+  room          Room      @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user          User      @relation("RoomInvitationRecipient", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  invited_by    User      @relation("RoomInvitationSender", fields: [invited_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([room_id, user_id], map: "index_room_invitations_on_room_user")
+  @@index([user_id, status, created_at], map: "index_room_invitations_on_user_status")
+  @@map("room_member_invitations")
+}
+
+model RoomKnock {
+  id             Int       @id @default(autoincrement())
+  room_id        Int       @map("room_id")
+  user_id        Int       @map("user_id")
+  status         String    @default("pending") @db.VarChar
+  reviewed_by_id Int?      @map("reviewed_by_id")
+  reviewed_at    DateTime? @map("reviewed_at") @db.Timestamp(6)
+  created_at     DateTime  @map("created_at") @db.Timestamp(6)
+  updated_at     DateTime  @map("updated_at") @db.Timestamp(6)
+  room           Room      @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user           User      @relation("RoomKnocker", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reviewed_by    User?     @relation("RoomKnockReviewer", fields: [reviewed_by_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@unique([room_id, user_id], map: "index_room_knocks_on_room_user")
+  @@index([room_id, status, created_at], map: "index_room_knocks_on_room_status")
+  @@map("room_knocks")
+}
+
+model ChatNoteCopy {
+  id              Int         @id @default(autoincrement())
+  message_id      Int         @map("message_id")
+  note_id         Int         @map("note_id")
+  copied_by_id    Int         @map("copied_by_id")
+  idempotency_key String      @map("idempotency_key") @db.VarChar(96)
+  created_at      DateTime    @map("created_at") @db.Timestamp(6)
+  message         ChatMessage @relation(fields: [message_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  note            Page        @relation(fields: [note_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  copied_by       User        @relation(fields: [copied_by_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([copied_by_id, idempotency_key], map: "index_chat_note_copies_on_actor_key")
+  @@index([message_id, note_id], map: "index_chat_note_copies_on_message_note")
+  @@map("chat_note_copies")
+}
+
+model RoomBanner {
+  id              Int                @id @default(autoincrement())
+  room_id         Int                @map("room_id")
+  created_by_id   Int                @map("created_by_id")
+  kind            String             @db.VarChar
+  placement       String             @db.VarChar
+  audience_type   String             @map("audience_type") @db.VarChar
+  visibility_rule String             @map("visibility_rule") @db.VarChar
+  action_type     String             @map("action_type") @db.VarChar
+  message         String?            @db.VarChar
+  metadata        Json               @default("{}") @db.Json
+  starts_at       DateTime?          @map("starts_at") @db.Timestamp(6)
+  ends_at         DateTime?          @map("ends_at") @db.Timestamp(6)
+  archived_at     DateTime?          @map("archived_at") @db.Timestamp(6)
+  created_at      DateTime           @map("created_at") @db.Timestamp(6)
+  updated_at      DateTime           @map("updated_at") @db.Timestamp(6)
+  room            Room               @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  created_by      User               @relation("RoomBannerCreator", fields: [created_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  targets         RoomBannerTarget[]
+
+  @@index([room_id, kind, archived_at], map: "index_room_banners_on_room_kind_archived")
+  @@map("room_banners")
+}
+
+model RoomBannerTarget {
+  id               Int        @id @default(autoincrement())
+  room_banner_id   Int        @map("room_banner_id")
+  user_id          Int        @map("user_id")
+  message_override String?    @map("message_override") @db.VarChar
+  dismissed_at     DateTime?  @map("dismissed_at") @db.Timestamp(6)
+  resolved_at      DateTime?  @map("resolved_at") @db.Timestamp(6)
+  created_at       DateTime   @map("created_at") @db.Timestamp(6)
+  updated_at       DateTime   @map("updated_at") @db.Timestamp(6)
+  banner           RoomBanner @relation(fields: [room_banner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user             User       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([room_banner_id, user_id], map: "index_room_banner_targets_on_banner_and_user")
+  @@index([user_id, resolved_at], map: "index_room_banner_targets_on_user_resolved")
+  @@map("room_banner_targets")
+}
+
+model Entry {
+  automated_creation Boolean @default(false)
+
+  id                          Int                     @id @default(autoincrement())
+  user_id                     Int                     @map("user_id")
+  created_at                  DateTime                @map("created_at") @db.Timestamp(6)
+  updated_at                  DateTime                @map("updated_at") @db.Timestamp(6)
+  status                      String                  @default("draft") @db.VarChar
+  format                      String                  @default("mixed_media") @db.VarChar
+  format_data                 Json?                   @map("format_data") @db.Json
+  room_id                     Int?                    @map("room_id")
+  published_at                DateTime?               @map("published_at") @db.Timestamp(6)
+  reply_mode                  String?                 @map("reply_mode") @db.VarChar
+  requested_feedback_types    Json?                   @map("requested_feedback_types") @db.Json
+  idea_guidance               String?                 @map("idea_guidance") @db.VarChar
+  feedback_request_customized Boolean                 @default(false) @map("feedback_request_customized")
+  round_id                 Int?                    @map("round_id")
+  project_id                  Int?                    @map("project_id")
+  creation_origin             String?                 @map("creation_origin") @db.VarChar
+  project_intent              String?                 @map("project_intent") @db.Text
+  project_question            String?                 @map("project_question") @db.Text
+  project_lyrics              String?                 @map("project_lyrics") @db.Text
+  source_entry_id             Int?                    @map("source_entry_id")
+  source_shared_entry_id      Int?                    @map("source_shared_entry_id")
+  source_reply_id             Int?                    @map("source_reply_id")
+  source_chat_message_id      Int?                    @map("source_chat_message_id")
+  source_author_name          String?                 @map("source_author_name") @db.VarChar
+  source_room_ids             Json?                   @db.Json
+  source_room_id              Int?
+  source_author_id            Int?
+  room_statement              String?                 @db.Text
+  shared_feedback             Json?                   @db.Json
+  share_request_key           String?                 @db.VarChar(128)
+  creation_request_key        String?                 @db.VarChar(128)
+  share_request_fingerprint   String?                 @db.VarChar(64)
+  locked                      Boolean                 @default(false)
+  notification_events         NotificationEvent[]
+  introductions               Introduction[]
+  view_states                 EntryViewState[]
+  subject                     EntrySubject?
+  user                        User                    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  round                    Round?               @relation(fields: [round_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  project                     Project?                @relation(fields: [project_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  chat_message                ChatMessage?
+  activity_submissions        ActivityParticipation[] @relation("ActivitySubmittedEntry")
+  activity_submission_records ActivitySubmission[]    @relation("ActivitySubmissionEntry")
+  activity_activity_artifact  ActivityArtifact?
+  replies                     Reply[]
+  round_result_entries        RoundResultEntry[]
+
+  @@unique([user_id, share_request_key], map: "index_entries_on_author_share_request")
+  @@unique([user_id, creation_request_key], map: "index_entries_on_author_creation_request")
+  @@unique([project_id, user_id, source_reply_id], map: "index_entries_on_project_saver_reply")
+  @@unique([project_id, user_id, source_chat_message_id], map: "index_entries_on_project_saver_chat_message")
+  @@index([room_id, status, published_at, id], map: "index_entries_on_room_status_published")
+  // Published Room-copy history uses the partial covering index defined in SQL.
+  @@index([user_id, status, published_at, id], map: "index_entries_on_author_publication_seek")
+  @@index([user_id, status, published_at, created_at, id], map: "index_entries_on_author_fallback_seek")
+  @@index([round_id, status, published_at, id], map: "index_entries_on_round_status_published")
+  @@index([project_id, status, published_at, id], map: "index_entries_on_project_status_published")
+  @@index([project_id, status, published_at, created_at, id], map: "index_entries_on_project_fallback_seek")
+  @@index([source_entry_id, status], map: "index_entries_on_source_entry_status")
+  @@map("entries")
+}
+
+model Project {
+  creation_request_key String?                @db.VarChar(128)
+  icon_symbol          String?                @db.VarChar(64)
+  icon_color           String?                @db.VarChar(16)
+  id                   Int                    @id @default(autoincrement())
+  owner_id             Int                    @map("owner_id")
+  name                 String                 @db.VarChar(120)
+  description          String?                @db.Text
+  created_at           DateTime               @map("created_at") @db.Timestamp(6)
+  updated_at           DateTime               @map("updated_at") @db.Timestamp(6)
+  owner                User                   @relation("ProjectOwner", fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  participations       ProjectParticipation[]
+  rooms                ProjectRoom[]
+  entries              Entry[]
+
+  @@unique([owner_id, creation_request_key], map: "index_projects_on_owner_creation_request")
+  @@index([owner_id, updated_at], map: "index_projects_on_owner_updated")
+  @@map("projects")
+}
+
+model ProjectRoom {
+  project_id Int      @map("project_id")
+  room_id    Int      @map("room_id")
+  created_at DateTime @map("created_at") @db.Timestamp(6)
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  room       Room     @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([project_id, room_id])
+  @@index([room_id, project_id], map: "index_project_rooms_on_room_project")
+  @@map("project_rooms")
+}
+
+model ProjectParticipation {
+  id            Int       @id @default(autoincrement())
+  project_id    Int       @map("project_id")
+  user_id       Int       @map("user_id")
+  invited_by_id Int       @map("invited_by_id")
+  status        String    @default("pending") @db.VarChar
+  invited_at    DateTime  @map("invited_at") @db.Timestamp(6)
+  responded_at  DateTime? @map("responded_at") @db.Timestamp(6)
+  created_at    DateTime  @map("created_at") @db.Timestamp(6)
+  updated_at    DateTime  @map("updated_at") @db.Timestamp(6)
+  project       Project   @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user          User      @relation("ProjectParticipant", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  invited_by    User      @relation("ProjectInviter", fields: [invited_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([project_id, user_id], map: "index_project_participations_on_project_user")
+  @@index([user_id, status, updated_at], map: "index_project_participations_on_user_status")
+  @@map("project_participations")
+}
+
+model Round {
+  id                       Int                       @id @default(autoincrement())
+  room_id                  Int?                      @map("room_id")
+  host_id                  Int                       @map("host_id")
+  name                     String                    @db.VarChar
+  prompt                   String?                   @db.Text
+  status                   String                    @default("draft") @db.VarChar
+  reply_mode               String                    @default("simple") @map("reply_mode") @db.VarChar
+  requested_feedback_types Json?                     @map("requested_feedback_types") @db.Json
+  idea_guidance            String?                   @map("idea_guidance") @db.VarChar
+  template_key             String                    @default("feedback") @map("activity_key") @db.VarChar
+  template_version         Int                       @default(1) @map("activity_version")
+  template_config          Json                      @default("{}") @map("activity_config") @db.Json
+  started_at               DateTime?                 @map("started_at") @db.Timestamp(6)
+  submit_by                DateTime?                 @map("submit_by") @db.Timestamp(6)
+  feedback_due_at          DateTime?                 @map("feedback_due_at") @db.Timestamp(6)
+  closed_at                DateTime?                 @map("closed_at") @db.Timestamp(6)
+  created_at               DateTime                  @map("created_at") @db.Timestamp(6)
+  updated_at               DateTime                  @map("updated_at") @db.Timestamp(6)
+  room                     Room?                     @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  host                     User                      @relation("ActivityHost", fields: [host_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  participations           ActivityParticipation[]
+  submission_records       ActivitySubmission[]
+  entries                  Entry[]
+  activity_artifacts       ActivityArtifact[]
+  activity_offers          ActivityOffer[]
+  activity_moderation      ActivityModerationEvent[]
+  round_result           RoundResult?
+
+  @@index([room_id, status, closed_at, id], map: "index_round_history_room_closed")
+  @@index([room_id, status, closed_at, updated_at, id], map: "index_round_history_room_fallback")
+  @@index([room_id, status], map: "index_rounds_on_room_status")
+  @@map("rounds")
+}
+
+// A wall freezes the completed round's membership, independently of current entries.
+/// Published selection of Entries from a completed Round, displayed as a Wall.
+/// Entry content remains referenced; this is not an immutable content snapshot.
+model RoundResult {
+  id            Int                @id @default(autoincrement())
+  round_id   Int                @unique @map("round_id")
+  room_id       Int                @map("room_id")
+  title         String             @db.Text
+  description   String?            @db.Text
+  published_at  DateTime           @db.Timestamp(6)
+  round      Round           @relation(fields: [round_id], references: [id], onDelete: Cascade)
+  room          Room               @relation(fields: [room_id], references: [id], onDelete: Cascade)
+  entries       RoundResultEntry[]
+  presentations RoundResultPresentation[]
+
+  @@index([room_id, published_at, id])
+  @@map("round_results")
+}
+
+model RoundResultEntry {
+  id          Int           @id @default(autoincrement())
+  round_result_id     Int
+  entry_id    Int?
+  position    Int
+  author_name String        @db.VarChar
+  result      RoundResult @relation(fields: [round_result_id], references: [id], onDelete: Cascade)
+  entry       Entry?        @relation(fields: [entry_id], references: [id], onDelete: SetNull)
+
+  @@unique([round_result_id, position])
+  @@unique([round_result_id, entry_id])
+  @@map("round_result_entries")
+}
+
+model RoundResultPresentation {
+  round_result_id      Int
+  user_id      Int
+  presented_at DateTime      @default(now()) @db.Timestamp(6)
+  result       RoundResult @relation(fields: [round_result_id], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([round_result_id, user_id])
+  @@map("round_result_presentations")
+}
+
+model ActivityParticipation {
+  id                 Int                  @id @default(autoincrement())
+  round_id        Int                  @map("round_id")
+  user_id            Int                  @map("user_id")
+  // Historical archive-only linkage; participation belongs to a Round and user.
+  role               String               @db.VarChar
+  status             String               @default("active") @db.VarChar
+  submitted_entry_id Int?                 @map("submitted_entry_id")
+  joined_at          DateTime             @map("joined_at") @db.Timestamp(6)
+  withdrawn_at       DateTime?            @map("withdrawn_at") @db.Timestamp(6)
+  created_at         DateTime             @map("created_at") @db.Timestamp(6)
+  updated_at         DateTime             @map("updated_at") @db.Timestamp(6)
+  round           Round             @relation(fields: [round_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user               User                 @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  submitted_entry    Entry?               @relation("ActivitySubmittedEntry", fields: [submitted_entry_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  submission_records ActivitySubmission[]
+
+  @@unique([round_id, user_id], map: "index_round_participations_on_round_user")
+  @@index([round_id, role, status], map: "index_round_participations_on_round_role_status")
+  @@index([submitted_entry_id], map: "index_round_participations_on_submitted_entry")
+  @@map("round_participations")
+}
+
+model ActivitySubmission {
+  id                        Int                    @id @default(autoincrement())
+  round_id               Int                    @map("round_id")
+  activity_participation_id Int?                   @map("round_participation_id")
+  entry_id                  Int                    @map("entry_id")
+  user_id                   Int                    @map("user_id")
+  submitted_at              DateTime               @map("submitted_at") @db.Timestamp(6)
+  superseded_at             DateTime?              @map("superseded_at") @db.Timestamp(6)
+  created_at                DateTime               @map("created_at") @db.Timestamp(6)
+  updated_at                DateTime               @map("updated_at") @db.Timestamp(6)
+  round                  Round               @relation(fields: [round_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  participation             ActivityParticipation? @relation(fields: [activity_participation_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  entry                     Entry                  @relation("ActivitySubmissionEntry", fields: [entry_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                      User                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([round_id, user_id, submitted_at], map: "index_round_submissions_on_round_user_submitted")
+  @@index([round_id, entry_id], map: "index_round_submissions_on_round_entry")
+  @@index([activity_participation_id], map: "index_round_submissions_on_participation")
+  @@index([entry_id], map: "index_round_submissions_on_entry")
+  @@map("round_submissions")
+}
+
+model ActivityArtifact {
+  id                 Int                       @id @default(autoincrement())
+  round_id        Int                       @map("round_id")
+  user_id            Int                       @map("user_id")
+  entry_id           Int                       @unique(map: "index_round_activity_artifacts_on_entry") @map("entry_id")
+  kind               String                    @db.VarChar
+  status             String                    @default("active") @db.VarChar
+  source_artifact_id Int?                      @map("source_artifact_id")
+  submitted_at       DateTime                  @map("submitted_at") @db.Timestamp(6)
+  removed_at         DateTime?                 @map("removed_at") @db.Timestamp(6)
+  created_at         DateTime                  @map("created_at") @db.Timestamp(6)
+  updated_at         DateTime                  @map("updated_at") @db.Timestamp(6)
+  round           Round                  @relation(fields: [round_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user               User                      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  entry              Entry                     @relation(fields: [entry_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  source_artifact    ActivityArtifact?         @relation("ActivityArtifactSource", fields: [source_artifact_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  derived_artifacts  ActivityArtifact[]        @relation("ActivityArtifactSource")
+  offers_as_first    ActivityOffer[]           @relation("ActivityFirstOffer")
+  offers_as_second   ActivityOffer[]           @relation("ActivitySecondOffer")
+  chosen_in_offers   ActivityOffer[]           @relation("ActivityChosenOffer")
+  moderation_events  ActivityModerationEvent[]
+
+  @@unique([round_id, user_id, kind], map: "index_round_activity_artifacts_on_round_user_kind")
+  @@index([round_id, kind, status], map: "index_round_activity_artifacts_on_round_kind_status")
+  @@index([source_artifact_id], map: "index_round_activity_artifacts_on_source")
+  @@map("round_activity_artifacts")
+}
+
+model ActivityOffer {
+  id                 Int               @id @default(autoincrement())
+  round_id        Int               @map("round_id")
+  user_id            Int               @map("user_id")
+  first_artifact_id  Int               @map("first_artifact_id")
+  second_artifact_id Int               @map("second_artifact_id")
+  chosen_artifact_id Int?              @map("chosen_artifact_id")
+  created_at         DateTime          @map("created_at") @db.Timestamp(6)
+  updated_at         DateTime          @map("updated_at") @db.Timestamp(6)
+  round           Round          @relation(fields: [round_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user               User              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  first_artifact     ActivityArtifact  @relation("ActivityFirstOffer", fields: [first_artifact_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  second_artifact    ActivityArtifact  @relation("ActivitySecondOffer", fields: [second_artifact_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  chosen_artifact    ActivityArtifact? @relation("ActivityChosenOffer", fields: [chosen_artifact_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@unique([round_id, user_id], map: "index_round_activity_offers_on_round_user")
+  @@index([first_artifact_id], map: "index_round_activity_offers_on_first")
+  @@index([second_artifact_id], map: "index_round_activity_offers_on_second")
+  @@index([chosen_artifact_id], map: "index_round_activity_offers_on_chosen")
+  @@index([user_id, updated_at, id], map: "index_round_choices_on_author_seek")
+  @@map("round_activity_offers")
+}
+
+model ActivityModerationEvent {
+  id                     Int              @id @default(autoincrement())
+  round_id            Int              @map("round_id")
+  artifact_id            Int              @map("artifact_id")
+  actor_id               Int              @map("actor_id")
+  action                 String           @db.VarChar
+  note                   String?          @db.Text
+  notification_requested Boolean          @default(false) @map("notification_requested")
+  notification_status    String?          @map("notification_status") @db.VarChar
+  created_at             DateTime         @map("created_at") @db.Timestamp(6)
+  round               Round         @relation(fields: [round_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  artifact               ActivityArtifact @relation(fields: [artifact_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  actor                  User             @relation("ActivityModerator", fields: [actor_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([round_id, artifact_id, created_at], map: "index_round_activity_moderation_on_artifact")
+  @@map("round_activity_moderation_events")
+}
+
+model EntrySubject {
+  id             Int      @id @default(autoincrement())
+  entry_id       Int      @unique @map("entry_id")
+  subject_type   String   @map("subject_type") @db.VarChar
+  subject_id     Int?     @map("subject_id")
+  subject_key    String?  @map("subject_key") @db.VarChar
+  source_node_id String?  @map("source_node_id") @db.VarChar
+  metadata       Json     @default("{}") @db.Json
+  created_at     DateTime @map("created_at") @db.Timestamp(6)
+  updated_at     DateTime @map("updated_at") @db.Timestamp(6)
+  entry          Entry    @relation(fields: [entry_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([subject_type, subject_id], map: "index_entry_subjects_on_type_and_id")
+  @@index([subject_type, subject_key], map: "index_entry_subjects_on_type_and_key")
+  @@map("entry_subjects")
+}
+
+model Introduction {
+  id              Int                     @id @default(autoincrement())
+  room_id         Int                     @map("room_id")
+  created_by_id   Int                     @map("created_by_id")
+  entry_id        Int?                    @map("entry_id")
+  note            String                  @db.Text
+  retracted_at    DateTime?               @map("retracted_at") @db.Timestamp(6)
+  retracted_by_id Int?                    @map("retracted_by_id")
+  created_at      DateTime                @map("created_at") @db.Timestamp(6)
+  updated_at      DateTime                @map("updated_at") @db.Timestamp(6)
+  room            Room                    @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  created_by      User                    @relation("IntroductionCreator", fields: [created_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  retracted_by    User?                   @relation("IntroductionRetractor", fields: [retracted_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  entry           Entry?                  @relation(fields: [entry_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  recipients      IntroductionRecipient[]
+
+  @@index([room_id, retracted_at, created_at], map: "index_introductions_on_room_retracted_created")
+  @@index([created_by_id, created_at], map: "index_introductions_on_creator_created")
+  @@index([entry_id], map: "index_introductions_on_entry_id")
+  @@map("introductions")
+}
+
+model IntroductionRecipient {
+  id              Int          @id @default(autoincrement())
+  introduction_id Int          @map("introduction_id")
+  user_id         Int          @map("user_id")
+  hidden_at       DateTime?    @map("hidden_at") @db.Timestamp(6)
+  seen_at         DateTime?    @map("seen_at") @db.Timestamp(6)
+  created_at      DateTime     @map("created_at") @db.Timestamp(6)
+  updated_at      DateTime     @map("updated_at") @db.Timestamp(6)
+  introduction    Introduction @relation(fields: [introduction_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user            User         @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([introduction_id, user_id], map: "index_introduction_recipients_on_intro_user")
+  @@index([user_id, hidden_at], map: "index_introduction_recipients_on_user_hidden")
+  @@map("introduction_recipients")
+}
+
+model LinkPreview {
+  id            Int                     @id @default(autoincrement())
+  url           String                  @unique @db.VarChar
+  canonical_url String?                 @map("canonical_url") @db.VarChar
+  title         String?                 @db.VarChar
+  description   String?
+  site_name     String?                 @map("site_name") @db.VarChar
+  image_url     String?                 @map("image_url") @db.VarChar
+  favicon_url   String?                 @map("favicon_url") @db.VarChar
+  accent_color  String?                 @map("accent_color") @db.VarChar
+  status        String                  @default("ready") @db.VarChar
+  error_code    String?                 @map("error_code") @db.VarChar
+  fetched_at    DateTime?               @map("fetched_at") @db.Timestamp(6)
+  created_at    DateTime                @map("created_at") @db.Timestamp(6)
+  updated_at    DateTime                @map("updated_at") @db.Timestamp(6)
+  attachments   LinkPreviewAttachment[]
+
+  @@index([status, fetched_at], map: "index_link_previews_on_status_fetched")
+  @@map("link_previews")
+}
+
+model LinkPreviewAttachment {
+  id         Int          @id @default(autoincrement())
+  owner_type String       @map("owner_type") @db.VarChar
+  owner_id   Int          @map("owner_id")
+  source_url String?      @map("source_url") @db.VarChar
+  preview_id Int?         @map("preview_id")
+  hidden     Boolean      @default(false)
+  created_at DateTime     @map("created_at") @db.Timestamp(6)
+  updated_at DateTime     @map("updated_at") @db.Timestamp(6)
+  preview    LinkPreview? @relation(fields: [preview_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@unique([owner_type, owner_id], map: "index_link_preview_attachments_on_owner")
+  @@index([preview_id], map: "index_link_preview_attachments_on_preview")
+  @@map("link_preview_attachments")
+}
+
+model Reply {
+  id                  Int                 @id @default(autoincrement())
+  user_id             Int?                @map("user_id")
+  entry_id            Int?                @map("entry_id")
+  chat_message_id     Int?                @map("chat_message_id")
+  created_at          DateTime            @map("created_at") @db.Timestamp(6)
+  updated_at          DateTime            @map("updated_at") @db.Timestamp(6)
+  status              String              @default("draft") @db.VarChar
+  published_at        DateTime?           @map("published_at") @db.Timestamp(6)
+  feedback_type       String?             @map("feedback_type") @db.VarChar
+  user                User?               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  entry               Entry?              @relation(fields: [entry_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  chat_message        ChatMessage?        @relation(fields: [chat_message_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  audio_annotations   AudioAnnotation[]
+  notification_events NotificationEvent[]
+
+  @@index([user_id, status, published_at, id], map: "index_replies_on_author_publication_seek")
+  @@index([user_id, status, published_at, created_at, id], map: "index_replies_on_author_fallback_seek")
+  @@index([entry_id, status, published_at, id], map: "index_replies_on_entry_status_published")
+  @@index([chat_message_id, status, published_at, id], map: "index_replies_on_chat_message_status_published")
+  @@map("replies")
+}
+
+model Page {
+  id             Int            @id @default(autoincrement())
+  title          String?        @db.VarChar
+  icon           String?        @db.VarChar
+  parent_note_id Int?
+  parent_id      Int?           @map("parent_id")
+  created_at     DateTime       @map("created_at") @db.Timestamp(6)
+  updated_at     DateTime       @map("updated_at") @db.Timestamp(6)
+  deleted_at     DateTime?      @map("deleted_at") @db.Timestamp(6)
+  room_id        Int?           @map("room_id")
+  pages          Page?          @relation("pagesTopages", fields: [parent_note_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_pages    Page[]         @relation("pagesTopages")
+  parent         Page?          @relation("PageTree", fields: [parent_id], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  children       Page[]         @relation("PageTree")
+  reflections    Reflection[]
+  chat_copies    ChatNoteCopy[]
+
+  @@index([room_id, deleted_at], map: "index_notes_on_room_deleted_at")
+  @@map("notes")
+}
+
+model Document {
+  id           Int      @id @default(autoincrement())
+  docable_type String   @map("docable_type") @db.VarChar
+  docable_id   Int      @map("docable_id")
+  content      Json     @default("{}") @map("content")
+  ydoc_state   Bytes?   @map("ydoc_state")
+  version      Int      @default(1)
+  created_at   DateTime @map("created_at") @db.Timestamp(6)
+  updated_at   DateTime @map("updated_at") @db.Timestamp(6)
+
+  @@unique([docable_type, docable_id], map: "index_documents_on_docable_type_and_docable_id")
+  @@index([docable_type, docable_id], map: "index_documents_on_docable")
+  @@map("documents")
+}
+
+model Reflection {
+  id               Int      @id @default(autoincrement())
+  page_id          Int      @map("note_id")
+  reflectable_type String   @map("reflectable_type") @db.VarChar
+  reflectable_id   Int      @map("reflectable_id")
+  user_id          Int?     @map("user_id")
+  created_at       DateTime @map("created_at") @db.Timestamp(6)
+  updated_at       DateTime @map("updated_at") @db.Timestamp(6)
+  page             Page     @relation(fields: [page_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users            User?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("reflections")
+}
+
+model Invite {
+  id            Int            @id @default(autoincrement())
+  email         String         @db.VarChar
+  invite_type   Int            @map("invite_type")
+  token         String         @db.VarChar
+  expires_at    DateTime       @map("expires_at") @db.Timestamp(6)
+  used_at       DateTime?      @map("used_at") @db.Timestamp(6)
+  invited_by_id Int            @map("invited_by_id")
+  created_at    DateTime       @map("created_at") @db.Timestamp(6)
+  updated_at    DateTime       @map("updated_at") @db.Timestamp(6)
+  room_id       Int?           @map("room_id")
+  invited_by    User           @relation("InviteSender", fields: [invited_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  room          Room?          @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tokens        OneTimeToken[]
+
+  @@unique([email, room_id, invite_type], map: "index_invites_on_email_room_id_invite_type")
+  @@map("invites")
+}
+
+model OneTimeToken {
+  id            Int       @id @default(autoincrement())
+  email         String    @db.VarChar
+  token         String    @db.VarChar
+  user_id       Int?      @map("user_id")
+  invite_id     Int?      @map("invite_id")
+  purpose       String    @db.VarChar
+  expires_at    DateTime  @map("expires_at") @db.Timestamp(6)
+  consumed_at   DateTime? @map("consumed_at") @db.Timestamp(6)
+  sent_at       DateTime? @map("sent_at") @db.Timestamp(6)
+  attempt_count Int       @default(0)
+  created_at    DateTime  @map("created_at") @db.Timestamp(6)
+  updated_at    DateTime  @map("updated_at") @db.Timestamp(6)
+  invite        Invite?   @relation(fields: [invite_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user          User?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("one_time_tokens")
+}
+
+model NotificationEvent {
+  id              Int                        @id @default(autoincrement())
+  event_type      String                     @map("event_type") @db.VarChar
+  actor_id        Int                        @map("actor_id")
+  room_id         Int                        @map("room_id")
+  entry_id        Int?                       @map("entry_id")
+  reply_id        Int?
+  target_user_id  Int?                       @map("target_user_id")
+  payload         Json                       @default("{}") @map("payload") @db.Json
+  target_path     String?                    @map("target_path") @db.VarChar
+  created_at      DateTime                   @map("created_at") @db.Timestamp(6)
+  updated_at      DateTime                   @map("updated_at") @db.Timestamp(6)
+  actor           User                       @relation("NotificationActor", fields: [actor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_3400c0d703")
+  target_user     User?                      @relation("NotificationTarget", fields: [target_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_4573107ab6")
+  room            Room                       @relation(fields: [room_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_ae6ac5706e")
+  entry           Entry?                     @relation(fields: [entry_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_d62a63df74")
+  reply           Reply?                     @relation(fields: [reply_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  inbox_items     NotificationInboxItem[]
+  push_deliveries NotificationPushDelivery[]
+
+  @@index([entry_id, event_type, room_id, target_user_id, id], map: "index_notification_events_on_entry_identity")
+  @@index([reply_id, event_type, room_id, target_user_id, id], map: "index_notification_events_on_reply_identity")
+  @@map("notification_events")
+}
+
+model NotificationInboxItem {
+  id                    Int                       @id @default(autoincrement())
+  user_id               Int                       @map("user_id")
+  notification_event_id Int                       @map("notification_event_id")
+  delivery_state        String                    @default("pending") @map("delivery_state") @db.VarChar
+  delivered_at          DateTime?                 @map("delivered_at") @db.Timestamp(6)
+  seen_at               DateTime?                 @db.Timestamp(6)
+  created_at            DateTime                  @map("created_at") @db.Timestamp(6)
+  updated_at            DateTime                  @map("updated_at") @db.Timestamp(6)
+  user                  User                      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  notification_event    NotificationEvent         @relation(fields: [notification_event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  push_delivery         NotificationPushDelivery?
+
+  @@unique([notification_event_id, user_id], map: "index_notification_inbox_items_on_event_and_user")
+  @@index([user_id, created_at, id], map: "index_notification_inbox_items_on_user_created_id")
+  @@index([user_id, seen_at, id], map: "index_notification_inbox_items_on_user_seen_id")
+  @@map("notification_inbox_items")
+}
+
+model NotificationPushDelivery {
+  id                         Int                             @id @default(autoincrement())
+  notification_inbox_item_id Int                             @unique @map("notification_inbox_item_id")
+  notification_event_id      Int                             @map("notification_event_id")
+  user_id                    Int                             @map("user_id")
+  state                      String                          @default("scheduled") @db.VarChar
+  scheduled_job_id           String?                         @map("scheduled_job_id") @db.VarChar
+  due_at                     DateTime                        @map("due_at") @db.Timestamp(6)
+  sent_at                    DateTime?                       @map("sent_at") @db.Timestamp(6)
+  cancelled_at               DateTime?                       @map("cancelled_at") @db.Timestamp(6)
+  skip_reason                String?                         @map("skip_reason") @db.VarChar
+  last_error                 String?                         @map("last_error") @db.Text
+  created_at                 DateTime                        @map("created_at") @db.Timestamp(6)
+  updated_at                 DateTime                        @map("updated_at") @db.Timestamp(6)
+  notification_inbox_item    NotificationInboxItem           @relation(fields: [notification_inbox_item_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  notification_event         NotificationEvent               @relation(fields: [notification_event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                       User                            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  device_attempts            NotificationPushDeviceAttempt[]
+
+  @@index([user_id, state, due_at], map: "index_notification_push_deliveries_on_user_state_due")
+  @@index([notification_event_id], map: "index_notification_push_deliveries_on_event")
+  @@map("notification_push_deliveries")
+}
+
+enum PushDeviceAttemptState {
+  started
+  sent
+  rejected
+  invalid
+  uncertain
+}
+
+/// Durable outcome per destination. Subscription ID is historical; endpoint credentials are never stored here.
+model NotificationPushDeviceAttempt {
+  id              Int                      @id @default(autoincrement())
+  delivery_id     Int
+  endpoint_hash   String                   @db.VarChar(64)
+  subscription_id Int
+  state           PushDeviceAttemptState   @default(started)
+  attempt_count   Int                      @default(1)
+  started_at      DateTime                 @db.Timestamp(6)
+  completed_at    DateTime?                @db.Timestamp(6)
+  last_error      String?                  @db.Text
+  delivery        NotificationPushDelivery @relation(fields: [delivery_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([delivery_id, endpoint_hash], map: "index_push_device_attempts_on_delivery_endpoint")
+  @@map("notification_push_device_attempts")
+}
+
+/// Active scopes are Post, Circle and Global; migration 20261030210000 enforces the SQL CHECK.
+model NotificationPreference {
+  id                Int      @id @default(autoincrement())
+  user_id           Int      @map("user_id")
+  scope_type        String   @default("Global") @map("scope_type") @db.VarChar
+  scope_id          Int?     @map("scope_id")
+  notification_type String   @default("all") @map("notification_type") @db.VarChar
+  delivery_mode     String   @default("immediate") @map("delivery_mode") @db.VarChar
+  push_enabled      Boolean  @default(true) @map("push_enabled")
+  created_at        DateTime @map("created_at") @db.Timestamp(6)
+  updated_at        DateTime @map("updated_at") @db.Timestamp(6)
+  user              User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  // NULL scope IDs are protected by the companion partial index in SQL.
+  @@unique([user_id, scope_type, scope_id], map: "index_notification_preferences_on_user_scope")
+  @@map("notification_preferences")
+}
+
+model EntryViewState {
+  id                    Int       @id @default(autoincrement())
+  user_id               Int       @map("user_id")
+  entry_id              Int       @map("entry_id")
+  entry_seen_at         DateTime? @map("entry_seen_at") @db.Timestamp(6)
+  reply_seen_through_at DateTime? @map("reply_seen_through_at") @db.Timestamp(6)
+  reply_seen_through_id Int?      @map("reply_seen_through_id")
+  created_at            DateTime  @map("created_at") @db.Timestamp(6)
+  updated_at            DateTime  @map("updated_at") @db.Timestamp(6)
+  user                  User      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  entry                 Entry     @relation(fields: [entry_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, entry_id], map: "index_entry_view_states_on_user_and_entry")
+  @@index([user_id], map: "index_entry_view_states_on_user_id")
+  @@index([entry_id], map: "index_entry_view_states_on_entry_id")
+  @@map("entry_view_states")
+}
+
+model UserNoticeCursor {
+  id              Int      @id @default(autoincrement())
+  user_id         Int      @unique(map: "index_user_notice_cursors_on_user_id") @map("user_id")
+  seen_through_at DateTime @map("seen_through_at") @db.Timestamp(6)
+  created_at      DateTime @map("created_at") @db.Timestamp(6)
+  updated_at      DateTime @map("updated_at") @db.Timestamp(6)
+  user            User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("user_notice_cursors")
+}
+
+model PushSubscription {
+  id         Int      @id @default(autoincrement())
+  endpoint   String?  @db.VarChar
+  p256dh     String?  @db.VarChar
+  auth       String?  @db.VarChar
+  subscribed Boolean? @default(false)
+  created_at DateTime @map("created_at") @db.Timestamp(6)
+  updated_at DateTime @map("updated_at") @db.Timestamp(6)
+  user_id    Int?     @map("user_id")
+
+  @@map("push_subscriptions")
+}
+
+model Role {
+  id         Int      @id @default(autoincrement())
+  user_id    Int      @map("user_id")
+  name       String   @db.VarChar
+  created_at DateTime @map("created_at") @db.Timestamp(6)
+  updated_at DateTime @map("updated_at") @db.Timestamp(6)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("roles")
+}
+
+enum MediaProcessingKind {
+  audio
+  video
+}
+
+enum MediaProcessingState {
+  processing
+  published
+  failed
+  superseded
+}
+
+model MediaProcessingAttempt {
+  id          String               @id @default(uuid()) @db.Uuid
+  blob_id     Int
+  generation  Int
+  kind        MediaProcessingKind
+  state       MediaProcessingState @default(processing)
+  output_key  String               @unique
+  error       String?
+  created_at  DateTime             @default(now()) @db.Timestamptz(6)
+  finished_at DateTime?            @db.Timestamptz(6)
+  blob        ActiveStorageBlob    @relation(fields: [blob_id], references: [id], onDelete: Cascade)
+
+  @@unique([blob_id, generation])
+  @@index([state, created_at, id])
+  @@map("media_processing_attempts")
+}
+
+model ActiveStorageBlob {
+  media_source_key               String?
+  media_generation               Int                          @default(0)
+  media_processing_attempts      MediaProcessingAttempt[]
+  id                             Int                          @id @default(autoincrement())
+  key                            String                       @db.VarChar
+  filename                       String                       @db.VarChar
+  content_type                   String?                      @map("content_type") @db.VarChar
+  metadata                       String?
+  service_name                   String                       @map("service_name") @db.VarChar
+  byte_size                      Int                          @map("byte_size")
+  checksum                       String?                      @db.VarChar
+  created_at                     DateTime                     @map("created_at") @db.Timestamp(6)
+  active_storage_attachments     ActiveStorageAttachment[]
+  active_storage_variant_records ActiveStorageVariantRecord[]
+  audio_assets                   AudioAsset[]
+  video_assets                   VideoAsset[]
+
+  @@map("active_storage_blobs")
+}
+
+model ActiveStorageAttachment {
+  id                   Int               @id @default(autoincrement())
+  name                 String            @db.VarChar
+  record_type          String            @map("record_type") @db.VarChar
+  record_id            Int               @map("record_id")
+  blob_id              Int               @map("blob_id")
+  created_at           DateTime          @map("created_at") @db.Timestamp(6)
+  active_storage_blobs ActiveStorageBlob @relation(fields: [blob_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([record_type, record_id, name, created_at, id], map: "index_attachments_on_identity_latest")
+  @@map("active_storage_attachments")
+}
+
+model ActiveStorageVariantRecord {
+  id                   Int               @id @default(autoincrement())
+  blob_id              Int               @map("blob_id")
+  variation_digest     String            @map("variation_digest") @db.VarChar
+  active_storage_blobs ActiveStorageBlob @relation(fields: [blob_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("active_storage_variant_records")
+}
+
+model AudioAsset {
+  id                 Int               @id @default(autoincrement())
+  blob_id            Int               @map("blob_id")
+  owner_id           Int               @map("owner_id")
+  source_type        String            @map("source_type") @db.VarChar
+  source_id          Int               @map("source_id")
+  title              String            @db.VarChar
+  original_filename  String            @map("original_filename") @db.VarChar
+  original_mime_type String?           @map("original_mime_type") @db.VarChar
+  processing_status  String            @map("processing_status") @db.VarChar
+  duration_ms        Int?              @map("duration_ms")
+  waveform_peaks     Json?             @map("waveform_peaks")
+  error_message      String?           @map("error_message") @db.VarChar
+  created_at         DateTime          @map("created_at") @db.Timestamp(6)
+  updated_at         DateTime          @map("updated_at") @db.Timestamp(6)
+  blob               ActiveStorageBlob @relation(fields: [blob_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  owner              User              @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  audio_annotations  AudioAnnotation[]
+
+  @@index([source_type, source_id], map: "index_audio_assets_on_source")
+  @@index([blob_id, id], map: "index_audio_assets_on_blob_id")
+  @@index([processing_status, id, updated_at], map: "index_audio_assets_on_status_seek")
+  @@map("audio_assets")
+}
+
+model VideoAsset {
+  id                 Int               @id @default(autoincrement())
+  blob_id            Int               @map("blob_id")
+  owner_id           Int               @map("owner_id")
+  source_type        String            @map("source_type") @db.VarChar
+  source_id          Int               @map("source_id")
+  title              String            @db.VarChar
+  original_filename  String            @map("original_filename") @db.VarChar
+  original_mime_type String?           @map("original_mime_type") @db.VarChar
+  processing_status  String            @map("processing_status") @db.VarChar
+  duration_ms        Int?              @map("duration_ms")
+  width              Int?
+  height             Int?
+  error_message      String?           @map("error_message") @db.VarChar
+  created_at         DateTime          @map("created_at") @db.Timestamp(6)
+  updated_at         DateTime          @map("updated_at") @db.Timestamp(6)
+  blob               ActiveStorageBlob @relation(fields: [blob_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  owner              User              @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([source_type, source_id], map: "index_video_assets_on_source")
+  @@index([blob_id, id], map: "index_video_assets_on_blob_id")
+  @@index([processing_status, id, updated_at], map: "index_video_assets_on_status_seek")
+  @@map("video_assets")
+}
+
+model AudioAnnotation {
+  id             Int        @id @default(autoincrement())
+  audio_asset_id Int        @map("audio_asset_id")
+  reply_id       Int        @map("reply_id")
+  anchor_ms      Int        @map("anchor_ms")
+  tolerance_ms   Int        @map("tolerance_ms")
+  created_by_id  Int        @map("created_by_id")
+  created_at     DateTime   @map("created_at") @db.Timestamp(6)
+  audio_asset    AudioAsset @relation(fields: [audio_asset_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  reply          Reply      @relation(fields: [reply_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  created_by     User       @relation("AudioAnnotationCreator", fields: [created_by_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([audio_asset_id, anchor_ms], map: "index_audio_annotations_on_asset_and_anchor")
+  @@map("audio_annotations")
+}
+
+model RoomVisit {
+  room_id          Int
+  user_id          Int
+  source           String   @db.VarChar(16)
+  last_activity_at DateTime @db.Timestamp(6)
+  expires_at       DateTime @db.Timestamp(6)
+  created_at       DateTime @default(now()) @db.Timestamp(6)
+  room             Room     @relation(fields: [room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user             User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([room_id, user_id])
+  @@index([expires_at])
+  @@map("room_visits")
+}
+
+// Ephemeral process leases, not business history or job completion evidence.
+model QueueWorkerHeartbeat {
+  instance_id String   @id @db.Uuid
+  seen_at     DateTime @db.Timestamp(6)
+
+  @@index([seen_at])
+  @@map("queue_worker_heartbeats")
+}
+
+// Connection keys are opaque, hashed, independently revocable and Project-scoped.
+model AgentConnection {
+  id String @id @default(uuid())
+  user_id Int
+  project_id Int
+  name String @db.VarChar(80)
+  token_hash String @unique @db.VarChar(64)
+  reporting_consent Boolean @default(false)
+  expires_at DateTime @db.Timestamp(6)
+  revoked_at DateTime? @db.Timestamp(6)
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  @@index([user_id, created_at])
+  @@map("agent_connections")
+}
+
+// Retained after Entry deletion/move so monitoring cannot recreate the same source.
+model AgentCaptureReceipt {
+  id String @id @default(uuid())
+  user_id Int
+  project_id Int
+  source_hash String @db.VarChar(64)
+  entry_id Int?
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  @@unique([user_id, project_id, source_hash])
+  @@map("agent_capture_receipts")
+}
+
+model AgentCaptureOperation {
+  id String @id @default(uuid())
+  user_id Int
+  operation_id String @db.VarChar(36)
+  fingerprint String @db.VarChar(64)
+  receipt_id String
+  @@unique([user_id, operation_id])
+  @@map("agent_capture_operations")
+}

@@ -1,0 +1,35 @@
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import type { Root } from 'react-dom/client';
+const mocks = vi.hoisted(() => ({ discard: vi.fn(), release: vi.fn() }));
+vi.mock('../../../../frontend/src/hooks/useAttachmentUpload', () => ({ useAttachmentUpload: () => ({ trigger: vi.fn() }) }));
+vi.mock('../../../../frontend/src/hooks/useMentionTargets', () => ({ useMentionTargets: () => [] }));
+vi.mock('../../../../frontend/src/lib/api', () => ({ client: { delete: mocks.discard } }));
+vi.mock('../../../../frontend/src/lib/chatFiles', () => ({ releaseChatFile: mocks.release }));
+const expo = '../../../../frontend';
+const { act, createElement } = await import(`${expo}/node_modules/react/index.js`) as typeof import('react');
+const { createRoot } = await import(`${expo}/node_modules/react-dom/client.js`) as typeof import('react-dom/client');
+const { useChatComposition } = await import(`${expo}/src/hooks/useChatComposition.ts`);
+let root: Root;
+beforeEach(() => { Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true); });
+afterEach(async () => { await act(async () => root?.unmount()); vi.clearAllMocks(); });
+it('retries an uncertain text send with its original content and nonce', async () => {
+  let state: any = { text: 'Keep this exact message', mentions: [], revision: 0 };
+  const draft = { read: () => state, update: (value: any) => { state = { ...state, ...(typeof value === 'function' ? value(state) : value) }; } };
+  const trigger = vi.fn().mockRejectedValueOnce(new Error('Acknowledgement lost')).mockResolvedValueOnce({ id: 91 });
+  const sent = vi.fn();
+  let composition!: ReturnType<typeof useChatComposition>;
+  function Probe() { composition = useChatComposition('1', draft as never, { send: { trigger } } as never, sent, true); return null; }
+  root = createRoot(document.createElement('div'));
+  await act(async () => root.render(createElement(Probe)));
+  await act(async () => composition.send());
+  expect(state.pending.body).toBe('Keep this exact message');
+  expect(composition.error).toBe('Could not confirm delivery. Check your connection and retry the same message.');
+  expect(state.operation).toBeUndefined();
+  expect(sent).not.toHaveBeenCalled();
+  await act(async () => composition.send());
+  expect(trigger).toHaveBeenCalledTimes(2);
+  expect(trigger.mock.calls[1][0]).toEqual(trigger.mock.calls[0][0]);
+  expect(state.pending).toBeNull();
+  expect(state.text).toBe('');
+  expect(sent).toHaveBeenCalledOnce();
+});

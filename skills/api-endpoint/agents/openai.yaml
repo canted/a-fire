@@ -1,0 +1,4 @@
+interface:
+  display_name: "Server API"
+  short_description: "NestJS API changes and safe production calls"
+  default_prompt: "Use $api-endpoint to inspect or change the server API, or safely exercise it in production."

@@ -1,0 +1,25 @@
+appId: co.canted.afire.preview.localhttps
+---
+- waitForAnimationToEnd:
+    timeout: 5000
+- runFlow:
+    when:
+      visible: Back to home
+    commands:
+      - tapOn: Back to home
+- waitForAnimationToEnd:
+    timeout: 5000
+- assertVisible: Rooms
+- scrollUntilVisible:
+    element: 'Expo performance ${COUNT} room,? Expo performance ${COUNT}'
+    direction: DOWN
+- tapOn:
+    text: 'Expo performance ${COUNT} room,? Expo performance ${COUNT}'
+- extendedWaitUntil:
+    visible: 'Reading ${COUNT}:.*'
+    timeout: 15000
+- waitForAnimationToEnd:
+    timeout: 5000
+- assertVisible: 'Reading ${COUNT}:.*'
+- assertVisible: Back to home
+- takeScreenshot: navigated-room

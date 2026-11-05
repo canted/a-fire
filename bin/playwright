@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+NODE_ENV=test exec pnpm exec playwright test "$@"

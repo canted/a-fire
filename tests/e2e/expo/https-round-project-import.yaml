@@ -1,0 +1,26 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Replace cover|Pin up an image
+    timeout: 30000
+- tapOn: Replace cover|Pin up an image
+- tapOn: Use a project entry
+- extendedWaitUntil:
+    visible: ${PROJECT_NAME}
+    timeout: 20000
+- tapOn: ${PROJECT_NAME}
+- extendedWaitUntil:
+    visible: Use this entry
+    timeout: 20000
+- assertNotVisible: Incompatible text-only project entry
+- tapOn: Use this entry
+- extendedWaitUntil:
+    visible: Publish Round contribution
+    timeout: 20000
+- tapOn: Publish Round contribution
+- extendedWaitUntil:
+    visible: Your cover is in
+    timeout: 30000
+- takeScreenshot: imported-project-cover

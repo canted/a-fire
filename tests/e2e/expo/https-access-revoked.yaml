@@ -1,0 +1,10 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Do not relaunch: prove an already-mounted conversation removes cached content.
+- extendedWaitUntil:
+    visible: Forbidden
+    timeout: 45000
+- assertNotVisible: 'Reading 70:.*'
+- assertNotVisible: Share in the original app
+- assertVisible: Try again
+- takeScreenshot: access-revoked

@@ -1,0 +1,27 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: afire-local-https://app/entries/5334
+- extendedWaitUntil:
+    visible: Message this entry.*
+    timeout: 30000
+- tapOn: Add attachment
+- tapOn: Choose photo or file
+- tapOn: Browse files
+- tapOn: Show roots
+- tapOn:
+    point: '25%,27%'
+- extendedWaitUntil:
+    visible: composition.txt
+    timeout: 20000
+- tapOn: composition.txt
+- extendedWaitUntil:
+    visible: Remove attachment
+    timeout: 15000
+- tapOn: Message this entry.*
+- inputText: Android entry file attachment
+- tapOn: Send
+- extendedWaitUntil:
+    notVisible: Remove attachment
+    timeout: 30000
+- assertVisible: Android entry file attachment
+- takeScreenshot: file-reply-published

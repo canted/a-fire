@@ -1,0 +1,31 @@
+appId: co.canted.afire.preview.localhttps
+---
+- runFlow: https-message-swipe.yaml
+- tapOn: Open Room details
+- assertVisible: Members
+- assertVisible: Side Rooms
+- takeScreenshot: room-details
+- tapOn: Start a side chat
+- tapOn: Select Reading peer
+- assertVisible: Remove Reading peer
+- tapOn: Remove Reading peer
+- assertVisible: Select Reading peer
+- tapOn: Cancel selection
+- tapOn:
+    text: Close Room details
+    index: 0
+- tapOn: Open Side Rooms shelf
+- assertVisible: Room details
+- takeScreenshot: side-rooms-shelf
+- tapOn: Room details
+- assertVisible: Members
+- tapOn:
+    text: Close Room details
+    index: 0
+- tapOn: Add attachment
+- assertVisible: Share
+- assertVisible: Record audio
+- takeScreenshot: attachment-sheet
+- tapOn: Cancel
+- assertVisible: Message Expo rich content.*
+- takeScreenshot: chat-return

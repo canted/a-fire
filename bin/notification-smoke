@@ -1,0 +1,472 @@
+#!/usr/bin/env node
+
+import fs from "node:fs"
+import path from "node:path"
+import process from "node:process"
+import { execFile } from "node:child_process"
+import { promisify } from "node:util"
+
+const execFileAsync = promisify(execFile)
+
+const DEFAULT_CONFIG_PATH = "fly.toml"
+const DEFAULT_SESSION_PATH = "tmp/agent-session.json"
+const DEFAULT_CIRCLE_ID = 4
+const DEFAULT_TIMEOUT_MS = 120_000
+const DEFAULT_POLL_MS = 2_000
+const DEFAULT_DEPLOY_MARKER_PATH = ".git/notification-smoke-last-deploy-sha"
+const DEFAULT_DEPLOY_COMMIT_LIMIT = 5
+const PRODUCTION_APP = "afire"
+
+export function parseNotificationSmokeArgs(argv) {
+  const parsed = {
+    app: process.env.FLY_APP_NAME,
+    baseUrl: process.env.SMOKE_BASE_URL,
+    configPath: process.env.FLY_CONFIG ?? DEFAULT_CONFIG_PATH,
+    sessionPath: process.env.SMOKE_SESSION_PATH ?? DEFAULT_SESSION_PATH,
+    roomId: Number(process.env.SMOKE_CIRCLE_ID ?? DEFAULT_CIRCLE_ID),
+    timeoutMs: Number(process.env.SMOKE_NOTIFICATION_TIMEOUT_MS ?? DEFAULT_TIMEOUT_MS),
+    pollMs: Number(process.env.SMOKE_NOTIFICATION_POLL_MS ?? DEFAULT_POLL_MS),
+    deployMarkerPath: process.env.SMOKE_DEPLOY_MARKER_PATH ?? DEFAULT_DEPLOY_MARKER_PATH,
+    deployCommitLimit: positiveInteger(process.env.SMOKE_DEPLOY_COMMIT_LIMIT, DEFAULT_DEPLOY_COMMIT_LIMIT),
+  }
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index]
+    if (/^https?:\/\//i.test(arg)) {
+      parsed.baseUrl = arg
+      continue
+    }
+    if (arg === "-a" || arg === "--app") {
+      parsed.app = argv[index + 1]
+      index += 1
+      continue
+    }
+    if (arg.startsWith("--app=")) {
+      parsed.app = arg.slice("--app=".length)
+      continue
+    }
+    if (arg === "-c" || arg === "--config") {
+      parsed.configPath = argv[index + 1]
+      index += 1
+      continue
+    }
+    if (arg.startsWith("--config=")) {
+      parsed.configPath = arg.slice("--config=".length)
+      continue
+    }
+    if (arg === "--deploy-marker") {
+      parsed.deployMarkerPath = argv[index + 1]
+      index += 1
+      continue
+    }
+    if (arg.startsWith("--deploy-marker=")) {
+      parsed.deployMarkerPath = arg.slice("--deploy-marker=".length)
+      continue
+    }
+    if (arg === "--deploy-commit-limit") {
+      parsed.deployCommitLimit = positiveInteger(argv[index + 1], DEFAULT_DEPLOY_COMMIT_LIMIT)
+      index += 1
+      continue
+    }
+    if (arg.startsWith("--deploy-commit-limit=")) {
+      parsed.deployCommitLimit = positiveInteger(arg.slice("--deploy-commit-limit=".length), DEFAULT_DEPLOY_COMMIT_LIMIT)
+    }
+  }
+
+  return parsed
+}
+
+export function flyAppFromConfig(configPath = DEFAULT_CONFIG_PATH) {
+  if (!fs.existsSync(configPath)) return null
+  const config = fs.readFileSync(configPath, "utf8")
+  const match = config.match(/^\s*app\s*=\s*['"]([^'"]+)['"]/m)
+  return match?.[1] ?? null
+}
+
+export function smokeBaseUrl(options) {
+  if (options.baseUrl) return stripTrailingSlash(options.baseUrl)
+  const app = options.app ?? flyAppFromConfig(options.configPath)
+  if (!app) {
+    throw new Error("SMOKE_BASE_URL or Fly app name is required for notification smoke tests.")
+  }
+  return `https://${app}.fly.dev`
+}
+
+export function flyAppName(options) {
+  if (process.env.SMOKE_NOTIFICATION_FLY_APP) return process.env.SMOKE_NOTIFICATION_FLY_APP
+  if (options.app) return options.app
+  return flyAppFromConfig(options.configPath)
+}
+
+export function shouldRunNotificationSmoke(options) {
+  if (process.env.SMOKE_REQUIRE_NOTIFICATION === "0") return false
+  if (process.env.SMOKE_NOTIFICATION_FORCE === "1") return true
+  return flyAppName(options) === PRODUCTION_APP
+}
+
+export function smokeMessageContent(now = new Date(), context = {}) {
+  const overrideText = process.env.SMOKE_NOTIFICATION_TEXT
+  const lines = overrideText ? [overrideText] : smokeMessageLines(now, context)
+  return {
+    body: lines.join("\n"),
+    content: {
+      type: "doc",
+      content: lines.map(textParagraph),
+    },
+  }
+}
+
+export function smokeMessageLines(_now, context = {}) {
+  const lines = []
+
+  const summary = context.deploySummary
+  if (!summary) return lines
+
+  lines.push(summary.heading)
+  if (summary.note) lines.push(summary.note)
+
+  if (summary.commits?.length) {
+    summary.commits.forEach((commit) => {
+      lines.push(`- ${commit.sha} ${commit.subject}`)
+    })
+  } else {
+    lines.push("- No new commits found.")
+  }
+
+  return lines
+}
+
+export function smokeMessageClientNonce(currentSha, now = new Date()) {
+  return `deploy-smoke-${currentSha || now.getTime()}`
+}
+
+export async function createSmokeMessage({
+  baseUrl,
+  roomId,
+  messageContent,
+  clientNonce,
+  session,
+  sessionPath,
+  request = apiJson,
+}) {
+  const message = await request(
+    baseUrl,
+    `/api/v2/rooms/${roomId}/chat/messages`,
+    { method: "POST", body: { ...messageContent, client_nonce: clientNonce } },
+    session,
+    sessionPath,
+  )
+  if (!Number.isSafeInteger(Number(message.id)) || Number(message.id) <= 0) {
+    throw new Error(`Chat message creation did not return a valid id: ${JSON.stringify(message)}`)
+  }
+
+  return message
+}
+
+export async function deployCommitSummary({
+  cwd = process.cwd(),
+  markerPath = DEFAULT_DEPLOY_MARKER_PATH,
+  limit = DEFAULT_DEPLOY_COMMIT_LIMIT,
+} = {}) {
+  const boundedLimit = positiveInteger(limit, DEFAULT_DEPLOY_COMMIT_LIMIT)
+  const currentSha = await gitOutput(["rev-parse", "HEAD"], cwd).catch(() => null)
+  if (!currentSha) {
+    return {
+      mode: "unavailable",
+      currentSha: null,
+      previousSha: null,
+      heading: "Commit summary unavailable",
+      note: "Git commit information was unavailable on this machine.",
+      commits: [],
+    }
+  }
+
+  const markerSha = process.env.SMOKE_DEPLOY_PREVIOUS_SHA ?? readDeployMarker(cwd, markerPath)
+  if (markerSha && (await gitCommitExists(markerSha, cwd))) {
+    const commits = await gitLogCommits([`${markerSha}..HEAD`], boundedLimit, cwd)
+    return {
+      mode: "since-last-deploy",
+      currentSha,
+      previousSha: markerSha,
+      heading: `Commits since last successful notification smoke deploy (${shortSha(markerSha)}..${shortSha(currentSha)})`,
+      commits,
+    }
+  }
+
+  const commits = await gitLogCommits(["HEAD"], boundedLimit, cwd)
+  return {
+    mode: "recent",
+    currentSha,
+    previousSha: markerSha ?? null,
+    heading: `Recent commits (last ${boundedLimit}; no previous deploy marker)`,
+    commits,
+  }
+}
+
+export function recordSuccessfulDeployMarker(markerPath, sha, cwd = process.cwd()) {
+  if (!sha) return
+  const resolvedPath = resolvePath(cwd, markerPath)
+  fs.mkdirSync(path.dirname(resolvedPath), { recursive: true })
+  fs.writeFileSync(resolvedPath, `${sha.trim()}\n`, { mode: 0o600 })
+}
+
+export function extractJsonFromOutput(output) {
+  const lines = output.trim().split(/\r?\n/).filter(Boolean)
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    const line = lines[index].trim()
+    if (!line.startsWith("{") && !line.startsWith("[")) continue
+    return JSON.parse(line)
+  }
+  throw new Error("No JSON payload found in command output.")
+}
+
+async function main() {
+  const options = parseNotificationSmokeArgs(process.argv.slice(2))
+  if (!shouldRunNotificationSmoke(options)) {
+    log("Skipping notification smoke for non-production app.")
+    return
+  }
+
+  const baseUrl = smokeBaseUrl(options)
+  const appName = flyAppName(options)
+  if (!appName) throw new Error("Fly app name is required for notification DB verification.")
+
+  const session = loadSession(options.sessionPath)
+  const deploySummary = await deployCommitSummary({
+    markerPath: options.deployMarkerPath,
+    limit: options.deployCommitLimit,
+  })
+  log(`Running notification smoke against ${baseUrl} circle=${options.roomId}`)
+
+  await apiJson(baseUrl, `/api/v1/rooms/${options.roomId}`, { method: "GET" }, session, options.sessionPath)
+  const now = new Date()
+  const messageContent = smokeMessageContent(now, {
+    appName,
+    baseUrl,
+    roomId: options.roomId,
+    deploySummary,
+  })
+  const message = await createSmokeMessage({
+    baseUrl,
+    roomId: options.roomId,
+    messageContent,
+    clientNonce: smokeMessageClientNonce(deploySummary.currentSha, now),
+    session,
+    sessionPath: options.sessionPath,
+  })
+
+  await waitForChatMessage(baseUrl, message.id, session, options)
+  const notification = await waitForNotificationDelivery(appName, message.id, options)
+  try {
+    recordSuccessfulDeployMarker(options.deployMarkerPath, deploySummary.currentSha)
+  } catch (error) {
+    log(`warning could not record notification smoke deploy marker: ${error instanceof Error ? error.message : String(error)}`)
+  }
+  log(
+    `ok notification-smoke message=${message.id} pinned=false event=${notification.event_id} inbox=${notification.inbox_count} sent=${notification.sent_count} push=${notification.push_count}`,
+  )
+}
+
+function loadSession(sessionPath) {
+  if (!fs.existsSync(sessionPath)) {
+    throw new Error(`Notification smoke session not found at ${sessionPath}. Set SMOKE_REQUIRE_NOTIFICATION=0 to skip.`)
+  }
+
+  const session = JSON.parse(fs.readFileSync(sessionPath, "utf8"))
+  if (!session.accessToken || !session.refreshToken) {
+    throw new Error(`Notification smoke session at ${sessionPath} must contain accessToken and refreshToken.`)
+  }
+  return session
+}
+
+async function apiJson(baseUrl, pathname, options, session, sessionPath, retry = true) {
+  const response = await fetch(`${baseUrl}${pathname}`, {
+    method: options.method,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  })
+
+  if ((response.status === 401 || response.status === 422) && retry) {
+    await refreshSession(baseUrl, session, sessionPath)
+    return apiJson(baseUrl, pathname, options, session, sessionPath, false)
+  }
+
+  const payload = await readResponsePayload(response)
+  if (!response.ok) {
+    throw new Error(`${options.method} ${pathname} returned HTTP ${response.status}: ${JSON.stringify(payload)}`)
+  }
+  return payload
+}
+
+async function refreshSession(baseUrl, session, sessionPath) {
+  const response = await fetch(`${baseUrl}/api/v1/auth/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken: session.refreshToken }),
+  })
+  const payload = await readResponsePayload(response)
+  if (!response.ok) {
+    throw new Error(`POST /api/v1/auth/refresh returned HTTP ${response.status}: ${JSON.stringify(payload)}`)
+  }
+
+  session.accessToken = payload.accessToken
+  session.refreshToken = payload.refreshToken
+  fs.mkdirSync(path.dirname(sessionPath), { recursive: true })
+  fs.writeFileSync(sessionPath, `${JSON.stringify(session, null, 2)}\n`, { mode: 0o600 })
+}
+
+async function readResponsePayload(response) {
+  const text = await response.text()
+  if (!text) return null
+  try {
+    return JSON.parse(text)
+  } catch {
+    return text
+  }
+}
+
+async function waitForChatMessage(baseUrl, messageId, session, options) {
+  await pollUntil(options, async () => {
+    const message = await apiJson(
+      baseUrl,
+      `/api/v2/rooms/${options.roomId}/chat/messages/${messageId}`,
+      { method: "GET" },
+      session,
+      options.sessionPath,
+    )
+    return Number(message.id) === Number(messageId) && !message.pinned_at
+  }, `chat message ${messageId} to remain available and unpinned`)
+}
+
+async function waitForNotificationDelivery(appName, messageId, options) {
+  return pollUntil(options, async () => {
+    const result = await queryNotificationDelivery(appName, messageId)
+    if (!result) return null
+    if (result.inbox_count > 0 && result.push_count > 0 && result.sent_count > 0 && result.failed_count === 0) {
+      return result
+    }
+    return null
+  }, `notification delivery rows for chat message ${messageId}`)
+}
+
+async function queryNotificationDelivery(appName, messageId) {
+  const remoteScript = `
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
+const messageId = Number(process.env.SMOKE_CHAT_MESSAGE_ID);
+const rows = await prisma.$queryRawUnsafe(
+  "select e.id as event_id, count(distinct i.id)::int as inbox_count, count(distinct d.id)::int as push_count, (count(distinct d.id) filter (where d.state = 'sent'))::int as sent_count, (count(distinct d.id) filter (where d.state = 'failed'))::int as failed_count from notification_events e left join notification_inbox_items i on i.notification_event_id = e.id left join notification_push_deliveries d on d.notification_event_id = e.id where e.event_type = 'chat_message_created' and e.payload->>'chat_message_id' = $1::text group by e.id order by e.id desc limit 1",
+  messageId
+);
+console.log(JSON.stringify(rows[0] ?? null, (_key, value) => typeof value === "bigint" ? value.toString() : value));
+await prisma.$disconnect();
+`
+
+  const remoteCommand = `SMOKE_CHAT_MESSAGE_ID=${shellQuote(String(messageId))} node --input-type=module -e ${shellQuote(remoteScript)}`
+  const command = `sh -lc ${shellQuote(remoteCommand)}`
+  const { stdout, stderr } = await execFileAsync("fly", ["ssh", "console", "-q", "-a", appName, "-C", command], {
+    maxBuffer: 1024 * 1024,
+  })
+  return extractJsonFromOutput(`${stdout}\n${stderr}`)
+}
+
+async function pollUntil(options, fn, description) {
+  const deadline = Date.now() + options.timeoutMs
+  let lastError = null
+
+  while (Date.now() < deadline) {
+    try {
+      const result = await fn()
+      if (result) return result
+    } catch (error) {
+      lastError = error
+    }
+    await sleep(options.pollMs)
+  }
+
+  if (lastError) {
+    throw new Error(`Timed out waiting for ${description}: ${lastError instanceof Error ? lastError.message : String(lastError)}`)
+  }
+  throw new Error(`Timed out waiting for ${description}.`)
+}
+
+function shellQuote(value) {
+  return `'${value.replaceAll("'", "'\\''")}'`
+}
+
+function textParagraph(text) {
+  return {
+    type: "paragraph",
+    content: [
+      {
+        type: "text",
+        text,
+      },
+    ],
+  }
+}
+
+async function gitOutput(args, cwd = process.cwd()) {
+  const { stdout } = await execFileAsync("git", args, { cwd, maxBuffer: 1024 * 1024 })
+  return stdout.trim()
+}
+
+async function gitCommitExists(sha, cwd = process.cwd()) {
+  try {
+    await gitOutput(["cat-file", "-e", `${sha}^{commit}`], cwd)
+    return true
+  } catch {
+    return false
+  }
+}
+
+async function gitLogCommits(revisions, limit, cwd = process.cwd()) {
+  const output = await gitOutput(["log", "--pretty=format:%h%x09%s", `--max-count=${String(limit)}`, ...revisions], cwd)
+  if (!output) return []
+  return output.split(/\r?\n/).filter(Boolean).map((line) => {
+    const [sha, ...subjectParts] = line.split("\t")
+    return { sha, subject: subjectParts.join("\t") }
+  })
+}
+
+function readDeployMarker(cwd, markerPath) {
+  const resolvedPath = resolvePath(cwd, markerPath)
+  if (!fs.existsSync(resolvedPath)) return null
+  const value = fs.readFileSync(resolvedPath, "utf8").trim()
+  return value || null
+}
+
+function resolvePath(cwd, value) {
+  return path.isAbsolute(value) ? value : path.resolve(cwd, value)
+}
+
+function shortSha(value) {
+  return String(value).slice(0, 8)
+}
+
+function positiveInteger(value, fallback) {
+  const parsed = Number(value)
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function stripTrailingSlash(value) {
+  return value.replace(/\/+$/, "")
+}
+
+function log(message) {
+  process.stdout.write(`${message}\n`)
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error)
+    process.exit(1)
+  })
+}

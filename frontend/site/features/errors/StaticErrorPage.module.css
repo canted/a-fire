@@ -1,0 +1,83 @@
+.page,
+.content {
+  min-height: 100vh;
+}
+
+.page {
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+.content {
+  display: flex;
+  max-width: 48rem;
+  margin-inline: auto;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 1.5rem;
+}
+
+.eyebrow,
+.status,
+.title,
+.message,
+.detail,
+.recovery p {
+  margin: 0;
+}
+
+.eyebrow {
+  color: var(--color-ink-muted);
+  font-family: var(--font-heading);
+  font-size: var(--text-size-sm);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.errorContent {
+  margin-top: 1.5rem;
+}
+
+.status {
+  color: var(--color-ink);
+  font-family: var(--font-hero), serif;
+  font-size: 3.75rem;
+  line-height: var(--line-height-tight);
+}
+
+.title {
+  margin-top: 0.75rem;
+  color: var(--color-ink);
+  font-family: var(--font-display), serif;
+  font-size: var(--text-size-3xl);
+}
+
+.message {
+  margin-top: 1rem;
+  color: var(--color-ink-muted);
+  font-size: var(--text-size-base);
+}
+
+.divider {
+  width: 4rem;
+  height: 1px;
+  margin-top: 1.5rem;
+  background: var(--color-crease);
+}
+
+.detail {
+  margin-top: 1rem;
+  color: var(--color-ink-muted);
+  font-size: var(--text-size-sm);
+}
+
+.recovery {
+  margin-top: 2.5rem;
+  color: var(--color-ink-muted);
+  font-size: var(--text-size-sm);
+}
+
+.link {
+  color: var(--color-cool);
+  text-decoration: underline;
+}

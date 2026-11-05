@@ -1,0 +1,18 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: 'afire-local-https://app/entries/5334'
+- extendedWaitUntil:
+    visible: 'Message this entry.*'
+    timeout: 30000
+- tapOn: 'Message this entry.*'
+- inputText: '${REPLY_TEXT}'
+- assertVisible: '${REPLY_TEXT}'
+- tapOn: 'Send'
+- extendedWaitUntil:
+    notVisible: 'Send'
+    timeout: 20000
+- extendedWaitUntil:
+    visible: '${REPLY_TEXT}'
+    timeout: 10000
+- takeScreenshot: entry-reply-visible

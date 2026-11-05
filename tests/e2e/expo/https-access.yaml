@@ -1,0 +1,16 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: ${ROOM_LINK}
+- repeat:
+    times: 2
+    commands:
+      - tapOn:
+          text: Open
+          optional: true
+- extendedWaitUntil:
+    visible: 'Reading 70:.*'
+    timeout: 30000
+- assertNotVisible: Load earlier messages
+- assertNotVisible: 'Reading 60:.*'
+- assertVisible: Share in the original app
+- takeScreenshot: visitor-window

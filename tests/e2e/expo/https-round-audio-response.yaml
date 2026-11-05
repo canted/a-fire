@@ -1,0 +1,79 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- scrollUntilVisible:
+    element:
+      text: Choose cover 1
+    direction: DOWN
+    centerElement: true
+- tapOn:
+    text: Choose cover 1
+- assertVisible:
+    text: Choose cover 1
+    selected: true
+- scrollUntilVisible:
+    element: Use this cover
+    direction: DOWN
+    centerElement: true
+- tapOn: Use this cover
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- scrollUntilVisible:
+    element: Pin up a musical response
+    direction: DOWN
+    centerElement: true
+- tapOn: Pin up a musical response
+- scrollUntilVisible:
+    element: Create a new entry
+    direction: DOWN
+- tapOn: Create a new entry
+- extendedWaitUntil:
+    visible: Record audio
+    timeout: 20000
+- assertNotVisible: Note and entry text
+- assertNotVisible: Choose photo
+- tapOn: Record audio
+- extendedWaitUntil:
+    visible: Recording [2-9]s
+    timeout: 15000
+- tapOn: Stop recording
+- assertVisible: Review recording
+- tapOn: Use recording
+- extendedWaitUntil:
+    visible: Insert attachment
+    timeout: 20000
+- tapOn: Insert attachment
+- extendedWaitUntil:
+    notVisible: Insert attachment
+    timeout: 30000
+- scrollUntilVisible:
+    element: Save draft and close
+    direction: DOWN
+- tapOn: Save draft and close
+- scrollUntilVisible:
+    element: Pin up a musical response
+    direction: DOWN
+- tapOn: Pin up a musical response
+- tapOn: Create a new entry
+- extendedWaitUntil:
+    visible: Publish Round contribution
+    timeout: 20000
+- takeScreenshot: audio-draft-reopened
+- scrollUntilVisible:
+    element: Publish Round contribution
+    direction: DOWN
+- tapOn: Publish Round contribution
+- extendedWaitUntil:
+    notVisible: Publish Round contribution
+    timeout: 30000
+- scrollUntilVisible:
+    element: Replace response
+    direction: UP
+- takeScreenshot: audio-response-published

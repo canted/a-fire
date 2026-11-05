@@ -1,0 +1,53 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    arguments:
+      "-EXDevMenuShowFloatingActionButton": "NO"
+- openLink: ${DEV_CLIENT_URL}
+- repeat:
+    times: 2
+    commands:
+      - tapOn:
+          text: Open
+          optional: true
+- takeScreenshot: startup
+- runFlow:
+    when:
+      visible: Connect
+    commands:
+      - tapOn: "http://"
+      - inputText: ${METRO_ORIGIN}
+      - hideKeyboard
+      - tapOn: Connect
+- extendedWaitUntil:
+    visible: "Email address|Rooms|Message Expo Room pilot.*|This is the developer menu.*|Source code explorer|Toggle performance monitor"
+    timeout: 120000
+- runFlow:
+    when:
+      visible: "This is the developer menu.*"
+    commands:
+      - tapOn: Continue
+- runFlow:
+    when:
+      visible: "Source code explorer|Toggle performance monitor"
+    commands:
+      - tapOn: Close
+- runFlow:
+    when:
+      visible: Back to home
+    commands:
+      - tapOn: Back to home
+- runFlow:
+    when:
+      visible: Rooms
+    commands:
+      - tapOn: Your profile
+      - tapOn: Sign out
+- extendedWaitUntil:
+    visible: Email address
+    timeout: 120000
+- tapOn: Email address
+- inputText: expo-pilot@example.test
+- hideKeyboard
+- tapOn: Continue
+- assertVisible: Verification code

@@ -1,0 +1,28 @@
+appId: co.canted.afire.preview.localhttps
+---
+# API 36 emulator fixture: synthetic icon is the only visible photo.
+- assertVisible: Photos
+- tapOn:
+    point: 16%, 59%
+- extendedWaitUntil:
+    visible: Insert attachment
+    timeout: 20000
+- tapOn: Insert attachment
+- extendedWaitUntil:
+    notVisible: Remove attachment
+    timeout: 30000
+- scrollUntilVisible:
+    element: Publish Round contribution
+    direction: DOWN
+- tapOn: Publish Round contribution
+- extendedWaitUntil:
+    visible: Your cover is in
+    timeout: 30000
+- assertVisible: Replace cover
+- takeScreenshot: published-cover
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Your cover is in
+    timeout: 30000
+- takeScreenshot: persisted-cover

@@ -1,0 +1,13 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    arguments:
+      "-EXDevMenuShowFloatingActionButton": "NO"
+- extendedWaitUntil:
+    visible: Rooms
+    timeout: 30000
+- tapOn:
+    text: Expo Room pilot
+    index: 0
+- assertVisible: "Message Expo Room pilot.*"
+- takeScreenshot: room-session-restored

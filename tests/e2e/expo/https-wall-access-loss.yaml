@@ -1,0 +1,9 @@
+appId: co.canted.afire.preview.localhttps
+---
+- extendedWaitUntil:
+    visible: This Wall could not be loaded.
+    timeout: 45000
+- assertNotVisible: Synthetic Wall contribution for Expo parity validation.
+- assertNotVisible: Synthetic Room Wall
+- assertNotVisible: Open entry
+- takeScreenshot: protected-wall-removed

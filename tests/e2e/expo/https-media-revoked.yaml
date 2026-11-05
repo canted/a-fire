@@ -1,0 +1,12 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Keep the mounted Room: its recovery heartbeat must remove private media.
+- extendedWaitUntil:
+    visible: 'Try again'
+    timeout: 45000
+- assertNotVisible: 'Rich content study'
+- assertNotVisible: 'Synthetic video study'
+- assertNotVisible: 'Play audio'
+- assertNotVisible: 'Pause audio'
+- assertNotVisible: 'Download study.txt'
+- takeScreenshot: revoked-media

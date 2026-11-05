@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+node frontend/scripts/check-boundaries.mjs
+node bin/check-ui-layout.mjs
+node bin/expo-tokens.mjs --check
+node bin/expo-assets.mjs --check
+
+exec pnpm exec eslint frontend server tests bin/dev bin/test bin/rename-site-html bin/server-smoke bin/notification-smoke bin/stage eslint.config.js vite.config.ts vitest.config.ts vitest.setup.ts playwright.config.ts tsup.config.ts --report-unused-disable-directives --max-warnings 0 "$@"

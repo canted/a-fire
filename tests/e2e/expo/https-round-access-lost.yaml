@@ -1,0 +1,9 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Run after the guarded fixture disables this synthetic non-owner membership.
+- extendedWaitUntil:
+    visible: This Round is unavailable or you no longer have access.
+    timeout: 45000
+- assertNotVisible: Choose this image
+- assertNotVisible: Withdraw participation
+- takeScreenshot: round-access-lost

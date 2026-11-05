@@ -1,0 +1,10 @@
+appId: co.canted.afire.preview.localhttps
+---
+- extendedWaitUntil:
+    visible: New messages. Scroll to bottom
+    timeout: 10000
+- assertVisible: 'Finding message…'
+- takeScreenshot: live-with-history-pending
+- tapOn: New messages. Scroll to bottom
+- assertVisible: 'Live during stalled history .*'
+- takeScreenshot: live-latest

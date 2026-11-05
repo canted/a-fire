@@ -1,0 +1,52 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat
+- extendedWaitUntil:
+    visible: Open Room details
+    timeout: 30000
+- tapOn: Open Room details
+- extendedWaitUntil:
+    visible: Start a side chat
+    timeout: 15000
+- assertVisible: Members
+- tapOn: Start a side chat
+- scrollUntilVisible:
+    element: Select Reading peer
+    direction: DOWN
+- tapOn: Select Reading peer
+- scrollUntilVisible:
+    element: Remove Reading peer
+    direction: UP
+- waitForAnimationToEnd
+- assertVisible: Remove Reading peer
+- takeScreenshot: selected-person-before-removal
+- tapOn:
+    text: Remove Reading peer
+    retryTapIfNoChange: true
+- assertNotVisible: Remove Reading peer
+- assertVisible: Create side chat
+- scrollUntilVisible:
+    element: Select Reading peer
+    direction: DOWN
+- tapOn: Select Reading peer
+- scrollUntilVisible:
+    element: Create side chat
+    direction: UP
+- takeScreenshot: side-selection
+- tapOn: Create side chat
+- extendedWaitUntil:
+    visible: Step out to parent Room
+    timeout: 20000
+- tapOn: Open Room details
+- assertVisible: Expo rich content
+- takeScreenshot: child-ancestry
+- tapOn: Step out to parent Room
+- extendedWaitUntil:
+    visible: Open Room details
+    timeout: 20000
+- assertNotVisible: Open Room Wall
+- extendedWaitUntil:
+    visible: Message Expo rich content.*
+    timeout: 15000
+- takeScreenshot: chat-return

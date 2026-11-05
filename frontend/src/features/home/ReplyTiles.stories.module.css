@@ -1,0 +1,10 @@
+@import "../../styles/tokens.css";
+.page { padding: 24px; background: var(--color-surface); color: var(--color-ink); font-family: Lato, sans-serif; }
+.page h1 { font-size: 24px; margin: 0 0 8px; }
+.page h2 { font-size: 18px; margin: 0 0 8px; }
+.page p { font-size: 14px; line-height: 1.5; max-width: 65ch; margin: 0 0 16px; }
+.section { margin-top: 32px; }
+.examples { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 24px; }
+.desktop { width: 620px; max-width: 100%; }
+.phone { width: 350px; max-width: 100%; }
+.page .status { min-height: 21px; margin: 8px 0 0; font-size: 12px; }

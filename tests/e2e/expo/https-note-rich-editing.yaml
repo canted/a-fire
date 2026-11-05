@@ -1,0 +1,44 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible: More tools
+    timeout: 30000
+- assertVisible: ${NOTE_BODY}
+- tapOn: ${NOTE_BODY}
+- runFlow:
+    when:
+      platform: iOS
+      visible: Done
+    commands:
+      - tapOn: Done
+- tapOn: More tools
+- assertVisible: Fewer tools
+- scrollUntilVisible:
+    element: Heading 2
+    direction: DOWN
+- tapOn: Heading 2
+- runFlow:
+    when:
+      platform: iOS
+      visible: Done
+    commands:
+      - tapOn: Done
+- scrollUntilVisible:
+    element: Note actions
+    direction: UP
+- tapOn: Note actions
+- tapOn: Save note
+- extendedWaitUntil:
+    visible: Saved
+    timeout: 15000
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible: Note actions
+    timeout: 15000
+- tapOn: Note actions
+- tapOn: Preview note
+- assertVisible: ${NOTE_BODY}
+- takeScreenshot: rich-note-reopened

@@ -1,0 +1,36 @@
+import { afterEach, expect, it, vi } from "vitest";
+import type { Root } from "react-dom/client";
+const doubles = vi.hoisted(() => ({ upload: vi.fn() }));
+vi.mock('../../../../frontend/src/lib/api/contentUpload', () => ({ uploadContent: doubles.upload }));
+vi.mock('../../../../frontend/src/lib/api', () => ({ client: {} }));
+vi.mock('../../../../frontend/src/lib/chatFiles', () => ({ appendPickedFile: vi.fn() }));
+const expo = '../../../../frontend';
+const { act, createElement } = await import(`${expo}/node_modules/react/index.js`) as typeof import('react');
+const { createRoot } = await import(`${expo}/node_modules/react-dom/client.js`) as typeof import('react-dom/client');
+const { SWRConfig } = await import(`${expo}/node_modules/swr/dist/index/index.mjs`);
+const { useAttachmentUpload } = await import(`${expo}/src/hooks/useAttachmentUpload.ts`);
+const { useRecordingPreview } = await import(`${expo}/src/hooks/useRecordingPreview.ts`);
+const { retainRecordingPreview } = await import(`${expo}/src/lib/recordingPreview.ts`);
+let root: Root;
+afterEach(async () => { await act(async () => root?.unmount()); vi.clearAllMocks(); });
+it('hands capture preview through upload into the session cache and removes it after the spectrum is ready', async () => {
+  const file = { id: 'capture', uri: 'blob:capture', type: 'audio/webm', name: 'take.webm', size: 32 };
+  retainRecordingPreview(file, [0.2, 0.4, 0.1], 2);
+  doubles.upload.mockResolvedValue({ audioAsset: { id: 42, title: 'Recording', status: 'processing' } });
+  let upload!: ReturnType<typeof useAttachmentUpload>;
+  let preview: ReturnType<typeof useRecordingPreview>;
+  function Probe({ complete }: { complete: boolean }) { upload = useAttachmentUpload('page', '1'); preview = useRecordingPreview(42, complete); return null; }
+  const cache = new Map();
+  const render = (complete: boolean) => act(async () => root.render(createElement(SWRConfig, { value: { provider: () => cache } }, createElement(Probe, { complete }))));
+  root = createRoot(document.createElement('div'));
+  await render(false);
+  let node: unknown;
+  await act(async () => { node = await upload.trigger({ attachment: file, draftId: 1, blockId: file.id }); });
+  expect(preview).toEqual({ peaks: [0.2, 0.4, 0.1], duration: 2 });
+  expect(JSON.stringify(node)).not.toContain('peaks');
+  expect(doubles.upload.mock.calls[0][2]).not.toHaveProperty('peaks');
+  await render(true);
+  expect(preview).toBeUndefined();
+  await render(false);
+  expect(preview).toBeUndefined();
+});

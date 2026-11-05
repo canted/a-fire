@@ -1,0 +1,20 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: ${ROOM_LINK}
+- repeat:
+    times: 2
+    commands:
+      - tapOn:
+          text: Open
+          optional: true
+- extendedWaitUntil:
+    visible: "Reading 20: A short creative update."
+    timeout: 60000
+- assertVisible: Scroll to bottom
+- takeScreenshot: https-release-cold-message
+- tapOn: Scroll to bottom
+- assertVisible: ${LATEST_MESSAGE}
+- takeScreenshot: https-release-latest
+- tapOn: Back to home
+- assertVisible: Rooms

@@ -1,0 +1,31 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- runFlow:
+    when:
+      visible: Rooms
+    commands:
+      - tapOn:
+          text: Expo Room pilot
+          index: 0
+- tapOn: "Message Expo Room pilot.*"
+- eraseText: 100
+- inputText: ${MESSAGE}
+- assertVisible: Send
+- takeScreenshot: room-keyboard
+- tapOn: Send
+- extendedWaitUntil:
+    visible: ${MESSAGE}
+    timeout: 15000
+- takeScreenshot: room-sent
+- tapOn: "Message Expo Room pilot.*"
+- inputText: ${DRAFT}
+- hideKeyboard
+- tapOn: Back to home
+- assertVisible: Rooms
+- tapOn:
+    text: Expo Room pilot
+    index: 0
+- assertVisible: ${DRAFT}
+- takeScreenshot: room-draft-restored

@@ -1,0 +1,57 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2859/notes
+- extendedWaitUntil:
+    visible: Expo android audio reply 1792115887231
+    timeout: 30000
+- tapOn: Expo android audio reply 1792115887231
+- extendedWaitUntil:
+    visible: Play Synthetic audio study
+    timeout: 30000
+- runFlow:
+    when:
+      platform: iOS
+      visible: Done
+    commands:
+      - tapOn: Done
+- scrollUntilVisible:
+    element: Play Synthetic audio study
+    direction: DOWN
+- tapOn: Play Synthetic audio study
+- extendedWaitUntil:
+    visible: Pause Synthetic audio study
+    timeout: 30000
+- takeScreenshot: persistent-audio-note
+- tapOn:
+    text: Back
+    index: 0
+- extendedWaitUntil:
+    visible: Expo android audio reply 1792115887231
+    timeout: 30000
+- assertVisible: "Seek Synthetic audio study.*"
+- assertVisible: Close audio
+- assertVisible: Reply at current time
+- takeScreenshot: persistent-audio-after-navigation
+- runFlow:
+    when:
+      visible: Pause audio
+    commands:
+      - tapOn: Pause audio
+- tapOn: Play audio
+- extendedWaitUntil:
+    visible: Pause audio
+    timeout: 10000
+- tapOn: Back to home
+- extendedWaitUntil:
+    visible: All rooms
+    timeout: 30000
+- assertVisible: Close audio
+- takeScreenshot: persistent-audio-home
+- tapOn: Reply at current time
+- extendedWaitUntil:
+    visible: ".*Message this entry.*"
+    timeout: 30000
+- assertVisible: Remove audio timestamp
+- takeScreenshot: persistent-audio-timestamp-destination
+- assertNotVisible: Close audio

@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+TSX_DISABLE_IPC=1 exec pnpm exec tsx --tsconfig tsconfig.server.json server/main.ts "$@"

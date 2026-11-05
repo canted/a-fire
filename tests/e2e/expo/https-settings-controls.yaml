@@ -1,0 +1,36 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/settings
+- extendedWaitUntil:
+    visible: Room Settings
+    timeout: 30000
+- scrollUntilVisible:
+    element: Reply style
+    direction: DOWN
+- tapOn: Reply style
+- tapOn: structured
+- assertVisible: Impression
+- assertVisible: Question
+- assertVisible: Idea
+- takeScreenshot: structured-reply-checkboxes
+- tapOn: Question
+- tapOn: Idea
+- takeScreenshot: last-reply-type-retained
+- scrollUntilVisible:
+    element: Remove.*benchmark
+    direction: DOWN
+- takeScreenshot: member-delete-pill
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/invites
+- extendedWaitUntil:
+    visible: Invite email or person
+    timeout: 30000
+- tapOn: Invite email or person
+- inputText: ${PERSON_QUERY}
+- extendedWaitUntil:
+    visible: Close person suggestions
+    timeout: 15000
+- takeScreenshot: invite-suggestions
+- tapOn: Close person suggestions
+- assertNotVisible: Close person suggestions

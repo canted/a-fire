@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+if [ "${SKIP_PREFLIGHT:-}" = "1" ]; then
+  echo "Skipping preflight because SKIP_PREFLIGHT=1"
+  exit 0
+fi
+
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if [ -n "$(git status --porcelain)" ] && [ "${ALLOW_DIRTY_DEPLOY:-}" != "1" ]; then
+    echo "Refusing to deploy a dirty worktree."
+    echo "Commit or stash changes first, or set ALLOW_DIRTY_DEPLOY=1 for an explicit emergency override."
+    exit 1
+  fi
+fi
+
+"$PWD/bin/lint"
+
+if [ "${PREFLIGHT_FULL:-}" = "1" ]; then
+  "$PWD/bin/test"
+else
+  "$PWD/bin/vitest"
+fi
+
+"$PWD/bin/build"

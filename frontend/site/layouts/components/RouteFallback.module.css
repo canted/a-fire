@@ -1,0 +1,35 @@
+.page {
+  composes: content from "../../styles/pageLayout.module.css";
+  padding-block: var(--app-grid-unit-2) 102px;
+  color: var(--color-ink);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--text-size-xl);
+  line-height: var(--line-height-tight);
+}
+
+.message {
+  margin: 0.5rem 0 0;
+  color: var(--color-ink-muted);
+  font-size: var(--text-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 3rem;
+  color: var(--color-ink-muted);
+  font-size: var(--text-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+@media (min-width: 640px) {
+  .page {
+    padding-top: var(--app-grid-unit-1);
+  }
+}

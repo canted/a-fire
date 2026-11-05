@@ -1,0 +1,11 @@
+# The synthetic viewer has a pending knock, not admission.
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/chat
+- extendedWaitUntil:
+    visible: Forbidden
+    timeout: 30000
+- assertVisible: Try again
+- assertNotVisible: Add attachment
+- takeScreenshot: pending-knock-denied

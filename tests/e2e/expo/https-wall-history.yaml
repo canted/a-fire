@@ -1,0 +1,23 @@
+# Use a synthetic historical Wall containing an unavailable entry.
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/chat?wall=${WALL_ID}
+- extendedWaitUntil:
+    visible: ${WALL_TITLE}
+    timeout: 30000
+- assertVisible: Entry no longer available.
+- assertNotVisible: Open entry
+- scrollUntilVisible:
+    element: Next wall
+    direction: DOWN
+- tapOn: Next wall
+- extendedWaitUntil:
+    visible: ${OTHER_WALL_BODY}
+    timeout: 15000
+- assertNotVisible: Entry no longer available.
+- tapOn: Back to Chat
+- extendedWaitUntil:
+    visible: Message Expo Wall parity.*
+    timeout: 15000
+- takeScreenshot: historical-wall-return

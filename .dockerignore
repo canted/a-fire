@@ -1,0 +1,74 @@
+# See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
+
+# Ignore git directory.
+/.git/
+/.gitignore
+
+# Ignore bundler config.
+/.bundle
+
+# Ignore all environment files (except templates).
+/.env*
+!/.env*.erb
+
+# Ignore all default key files.
+/config/master.key
+/config/credentials/*.key
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/.keep
+
+# Ignore storage (uploaded files in development and any SQLite databases).
+/storage/*
+!/storage/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+
+# Ignore assets.
+/node_modules/
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.expo/
+/frontend/ios/
+/frontend/android/
+/frontend/.env*
+/app/assets/builds/*
+!/app/assets/builds/.keep
+/public/assets
+# Generated frontend is rebuilt inside the image; copying it breaks atomic
+# directory replacement across Docker overlay layers.
+/public/frontend/
+/public/site/
+/dist/
+/storybook-static/
+
+# Local Prisma engine downloads; clients are generated inside the image.
+/.prisma/
+
+# Tests and coverage are not inputs to the production build.
+/tests/
+/coverage/
+
+# Ignore CI service files.
+/.github
+
+# Ignore development files
+/.claude
+/.codex
+/.devcontainer
+/.agents/
+/.impeccable/
+
+# Ignore Docker-related files
+/.dockerignore
+/Dockerfile*
+
+# Local cloud credentials must never enter image build contexts.
+/.aws/

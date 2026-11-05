@@ -1,0 +1,17 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: "Rooms|Message .*"
+    timeout: 30000
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: "Message Expo reading parity.*"
+    timeout: 15000
+- runFlow:
+    when:
+      visible: "Scroll to bottom|New messages. Scroll to bottom"
+    commands:
+      - tapOn: "Scroll to bottom|New messages. Scroll to bottom"
+- pressKey: home

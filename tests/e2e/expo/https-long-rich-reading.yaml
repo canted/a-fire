@@ -1,0 +1,30 @@
+# seedExpoRichContent(5, 2000); supply ROOM_LINK for the returned Room.
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: 'Rich content study'
+    timeout: 30000
+- assertVisible: '.*Bold phrase.*'
+- scrollUntilVisible:
+    element: Play audio
+    direction: UP
+- waitForAnimationToEnd:
+    timeout: 5000
+- tapOn:
+    text: Play audio
+    waitToSettleTimeoutMs: 0
+- assertVisible: Pause audio
+- tapOn: Pause audio
+- assertVisible: Play audio
+- scrollUntilVisible:
+    element: 'Reading 1980:.*'
+    direction: UP
+- takeScreenshot: long-mixed-history-position
+- tapOn: Back to home
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: 'Reading 1980:.*'
+    timeout: 30000
+- takeScreenshot: long-mixed-history-restored

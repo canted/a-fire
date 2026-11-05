@@ -1,0 +1,17 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: 'Message Expo rich content.*'
+    timeout: 20000
+- scrollUntilVisible:
+    element:
+      text: 'Rich content study'
+    direction: DOWN
+- assertVisible: 'Download study.txt'
+- scrollUntilVisible:
+    element:
+      text: 'Play audio'
+    direction: UP
+- assertVisible: 'Synthetic video study'
+- takeScreenshot: loaded-media

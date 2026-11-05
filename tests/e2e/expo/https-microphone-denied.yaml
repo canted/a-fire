@@ -1,0 +1,15 @@
+# Run only after explicitly authorized microphone denial; restore access afterward.
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: ${ROOM_LINK}
+- extendedWaitUntil:
+    visible: Message Expo rich content.*
+    timeout: 30000
+- tapOn: Add attachment
+- tapOn: Record audio
+- extendedWaitUntil:
+    visible: Microphone access is off.*
+    timeout: 15000
+- assertVisible: Add attachment
+- assertNotVisible: Use recording
+- takeScreenshot: microphone-denied

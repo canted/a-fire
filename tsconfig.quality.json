@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.json",
+  "references": [],
+  "compilerOptions": {
+    "noEmit": true,
+    "strict": true
+  },
+  "include": [
+    "frontend/site",
+    "server",
+    "tests",
+    "types",
+    ".storybook/**/*.ts",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "vitest.setup.ts",
+    "playwright.config.ts",
+    "tsup.config.ts"
+  ],
+  "exclude": [
+    "frontend/src",
+    "frontend/node_modules",
+    "frontend/dist",
+    "frontend/ios",
+    "frontend/android"
+  ]
+}

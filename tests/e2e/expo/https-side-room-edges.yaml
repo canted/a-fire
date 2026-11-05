@@ -1,0 +1,42 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat
+- extendedWaitUntil:
+    visible: Open Room details
+    timeout: 30000
+- tapOn: Open Room details
+- tapOn: Member actions
+- tapOn: Invite a member to a Room
+- scrollUntilVisible:
+    element: Select Reading peer
+    direction: DOWN
+- tapOn: Select Reading peer
+- scrollUntilVisible:
+    element: Invite to Expo carry target
+    direction: DOWN
+- tapOn: Invite to Expo carry target
+- extendedWaitUntil:
+    visible: Room invitation sent.
+    timeout: 15000
+- tapOn: Member actions
+- tapOn: Invite a member to a Room
+- scrollUntilVisible:
+    element: Select Reading peer
+    direction: DOWN
+- tapOn: Select Reading peer
+- scrollUntilVisible:
+    element: Suggest knock for Expo suggestion target
+    direction: DOWN
+- tapOn: Suggest knock for Expo suggestion target
+- extendedWaitUntil:
+    visible: Suggestion to knock sent.
+    timeout: 15000
+- scrollUntilVisible:
+    element: Knock on Expo knock target
+    direction: DOWN
+- tapOn: Knock on Expo knock target
+- extendedWaitUntil:
+    visible: Your knock has been sent.
+    timeout: 15000
+- takeScreenshot: side-room-actions-complete

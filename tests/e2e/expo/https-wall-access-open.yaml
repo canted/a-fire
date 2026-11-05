@@ -1,0 +1,7 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/${ROOM_ID}/chat?wall=${WALL_ID}
+- extendedWaitUntil:
+    visible: Synthetic Wall contribution for Expo parity validation.
+    timeout: 30000

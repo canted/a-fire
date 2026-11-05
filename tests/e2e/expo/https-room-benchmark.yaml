@@ -1,0 +1,19 @@
+appId: co.canted.afire.preview.localhttps
+---
+# One Maestro process avoids repeated Java startup/JIT during measurements.
+# Start signed in on Home. The child flow also returns from an open Room.
+- repeat:
+    times: 3
+    commands:
+      - runFlow:
+          file: https-room-navigation.yaml
+          env:
+            COUNT: '70'
+      - runFlow:
+          file: https-room-navigation.yaml
+          env:
+            COUNT: '500'
+      - runFlow:
+          file: https-room-navigation.yaml
+          env:
+            COUNT: '2000'

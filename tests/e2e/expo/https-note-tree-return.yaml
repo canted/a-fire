@@ -1,0 +1,39 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: afire-local-https:///app/rooms/${ROOM_ID}/notes
+- scrollUntilVisible:
+    element: Notes
+    direction: UP
+- assertVisible: Notes
+- scrollUntilVisible:
+    element: ${NOTE_TITLE}
+    direction: DOWN
+- tapOn: ${NOTE_TITLE}
+- extendedWaitUntil:
+    visible:
+      text: More tools
+      enabled: true
+    timeout: 30000
+- assertVisible: ${NOTE_TITLE}
+- scrollUntilVisible:
+    element: Back
+    direction: UP
+- tapOn: Back
+- scrollUntilVisible:
+    element: Notes
+    direction: UP
+- extendedWaitUntil:
+    visible: Notes
+    timeout: 20000
+- scrollUntilVisible:
+    element: ${NOTE_TITLE}
+    direction: DOWN
+- tapOn: ${NOTE_TITLE}
+- extendedWaitUntil:
+    visible:
+      text: More tools
+      enabled: true
+    timeout: 30000
+- assertVisible: ${NOTE_TITLE}
+- assertVisible: Saved
+- takeScreenshot: note-tree-return

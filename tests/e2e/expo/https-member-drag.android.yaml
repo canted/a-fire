@@ -1,0 +1,19 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat
+- extendedWaitUntil:
+    visible: Message Expo rich content.*
+    timeout: 20000
+- tapOn: Open Room details
+- assertVisible: Members
+# API 36 Android emulator: third member row → New Side Chat target (presence can reorder peers).
+- swipe:
+    start: 26%,37%
+    end: 75%,24%
+    duration: 1200
+- assertVisible: Remove (web|android|ios) benchmark
+- assertVisible: Create side chat
+- takeScreenshot: member-dropped
+- tapOn: Cancel selection
+- assertNotVisible: Create side chat

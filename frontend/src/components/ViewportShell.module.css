@@ -1,0 +1,107 @@
+@import "../styles/tokens.css";
+
+.shell {
+  box-sizing: border-box;
+  position: fixed;
+  inset: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--room-surface);
+  padding-top: env(safe-area-inset-top);
+  /* Content owns the standard gutter; the shell adds only the device excess. */
+  padding-left: calc(var(--app-page-inset-start) - var(--app-page-inline-inset));
+  padding-right: calc(var(--app-page-inset-end) - var(--app-page-inline-inset));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+:global(html),
+:global(body) {
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+:global([role="button"]),
+:global(button),
+:global(a) {
+  -webkit-tap-highlight-color: transparent;
+}
+:global([tabindex]:focus:not(:focus-visible)),
+:global(button:focus:not(:focus-visible)) {
+  outline: none !important;
+}
+:global([role="button"]:focus-visible),
+:global(button:focus-visible) {
+  outline: var(--focus-outline);
+  outline-offset: 3px;
+}
+
+.shell::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: env(safe-area-inset-bottom, 0px);
+  background: var(--toolbar-surface);
+  pointer-events: none;
+}
+.shell[data-keyboard-open]::after { display: none; }
+.dock {
+  background: var(--toolbar-surface);
+  position: relative;
+  flex-shrink: 0;
+}
+.floatingPlayer {
+  position: absolute;
+  inset: auto 0 100%;
+  z-index: 4;
+  pointer-events: none;
+}
+.dock:not(:has([id="viewport-toolbar"])) .floatingPlayer {
+  bottom: calc(100% + max(0px, calc(8px - env(safe-area-inset-bottom, 0px))));
+}
+.floatingPlayer > * {
+  pointer-events: auto;
+}
+.dock:has([data-testid="audio-player-widget"])
+  :global([data-audio-clearance="latest"]) {
+  margin-bottom: 62px;
+}
+
+/* Text-entry fields never acquire a focus ring, including keyboard focus. */
+:global(input:focus),
+:global(textarea:focus),
+:global([contenteditable="true"]:focus) {
+  outline: none;
+  box-shadow: none;
+}
+
+/* The shell already supplies the device inset; add only the remaining toolbar
+   clearance so the total matches the canonical max(16px, safe-area) + 20px. */
+.dock:has([id="viewport-toolbar"]) {
+  padding-bottom: calc(var(--bottom-toolbar-bottom-inset) - env(safe-area-inset-bottom, 0px));
+}
+/* In-panel footers share toolbar clearance without leaving their moving panel. */
+.shell [data-viewport-bottom-controls] {
+  padding-bottom: calc(var(--bottom-toolbar-bottom-inset) - env(safe-area-inset-bottom, 0px) + var(--bottom-toolbar-control-padding));
+}
+.shell[data-keyboard-open] {
+  padding-bottom: 0;
+}
+.shell[data-keyboard-open] .dock:has([id="viewport-toolbar"]) {
+  padding-bottom: 8px;
+}
+
+/* A lone FAB uses the same viewport/audio host without reserving a toolbar row. */
+.dock:has([id="floating-viewport-toolbar"]) {
+  position: absolute;
+  inset: auto 0 env(safe-area-inset-bottom, 0px);
+  background: transparent;
+  pointer-events: none;
+}
+.shell[data-keyboard-open] .dock:has([id="floating-viewport-toolbar"]) {
+  bottom: 0;
+}
+
+.shell[data-keyboard-open] [data-viewport-bottom-controls] {
+  padding-bottom: calc(8px + var(--bottom-toolbar-control-padding));
+}

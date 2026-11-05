@@ -1,0 +1,13 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- extendedWaitUntil:
+    visible: "Reconnecting…|Offline.*|Syncing messages…"
+    timeout: 45000
+- assertVisible: "Message Expo reading parity.*"
+- takeScreenshot: recovery-disconnected
+- extendedWaitUntil:
+    visible: ${MESSAGE}
+    timeout: 60000
+- takeScreenshot: recovery-restored

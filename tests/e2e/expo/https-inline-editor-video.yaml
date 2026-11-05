@@ -1,0 +1,18 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/note/${NOTE_ID}
+- extendedWaitUntil:
+    visible: Play Synthetic video study
+    timeout: 30000
+- assertVisible: Remove video
+- tapOn: Play Synthetic video study
+- extendedWaitUntil:
+    visible: Close Content preview
+    timeout: 30000
+- assertNotVisible: Video unavailable.
+- takeScreenshot: editor-video-playback
+- tapOn: Close Content preview
+- assertVisible: Remove video
+- assertVisible: Play Synthetic video study
+- takeScreenshot: editor-video-return

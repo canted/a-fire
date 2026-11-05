@@ -1,0 +1,14 @@
+# Run after restoring the synthetic Room membership.
+appId: co.canted.afire.preview.localhttps
+---
+- tapOn: Retry note
+- extendedWaitUntil:
+    visible:
+      text: More tools
+      enabled: true
+    timeout: 30000
+- assertVisible: ${NOTE_BODY}
+- tapOn: Note actions
+- assertVisible: Save note
+- tapOn: Close Note actions
+- takeScreenshot: protected-note-restored

@@ -1,0 +1,20 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Choose cover 1
+    timeout: 30000
+- tapOn: Choose cover 1
+- assertVisible:
+    text: Choose cover 1
+    selected: true
+- scrollUntilVisible:
+    element: Use this cover
+    direction: DOWN
+- tapOn: Use this cover
+- extendedWaitUntil:
+    visible: Make your response
+    timeout: 30000
+- assertVisible: Pin up a musical response
+- takeScreenshot: confirmed-cover-choice

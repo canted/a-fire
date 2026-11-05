@@ -1,0 +1,23 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- runFlow:
+    when:
+      visible: Rooms
+    commands:
+      - tapOn:
+          text: Expo Room pilot
+          index: 0
+- tapOn: "Message Expo Room pilot.*"
+- eraseText: 100
+- inputText: A multiline Room draft that wraps onto a second line
+- assertVisible: Send
+- takeScreenshot: room-keyboard-multiline
+- hideKeyboard
+- tapOn: Back to home
+- tapOn:
+    text: Expo Room pilot
+    index: 0
+- assertVisible: ".*A multiline Room draft that wraps onto a second line.*"
+- takeScreenshot: room-multiline-restored

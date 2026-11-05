@@ -1,0 +1,30 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/board/${BOARD_ID}/activities/${ROUND_ID}
+- extendedWaitUntil:
+    visible: Pin up an entry
+    timeout: 30000
+- tapOn: Pin up an entry
+- scrollUntilVisible:
+    element: Create a new entry
+    direction: DOWN
+- tapOn: Create a new entry
+- extendedWaitUntil:
+    visible: Native parity title
+    timeout: 15000
+- assertVisible: Synthetic native destination contribution.
+- scrollUntilVisible:
+    element:
+      text: Publish Round contribution
+    direction: DOWN
+- tapOn:
+    text: Publish Round contribution
+- extendedWaitUntil:
+    notVisible: Save draft and close
+    timeout: 15000
+- scrollUntilVisible:
+    element: Native parity title
+    direction: DOWN
+- assertVisible: Synthetic native destination contribution.
+- takeScreenshot: round-published

@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+# This release path is explicit until the web acceptance/cutover gate passes.
+# Export to a staging directory first; a failed export must not erase a good build.
+node bin/build-expo-web.mjs "$@"

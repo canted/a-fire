@@ -1,0 +1,9 @@
+appId: co.canted.afire.preview.localhttps
+---
+# Run only after the guarded fixture restores membership.
+- tapOn: Retry Round
+- extendedWaitUntil:
+    visible: ${ROUND_NAME}
+    timeout: 30000
+- assertNotVisible: This Round is unavailable or you no longer have access.
+- takeScreenshot: round-access-restored

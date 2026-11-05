@@ -1,0 +1,24 @@
+appId: co.canted.afire.preview
+---
+- launchApp:
+    stopApp: false
+- tapOn: Verification code
+- inputText: ${OTP}
+- swipe:
+    start: 50%, 40%
+    end: 50%, 20%
+- scrollUntilVisible:
+    element: Sign in
+    direction: DOWN
+    timeout: 15000
+- tapOn: Sign in
+- extendedWaitUntil:
+    visible: Rooms
+    timeout: 30000
+- takeScreenshot: home
+- tapOn:
+    text: Expo Room pilot
+    index: 0
+- assertVisible: "Message Expo Room pilot.*"
+- assertVisible: "Pilot message 70:.*"
+- runFlow: send.yaml

@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+
+import { existsSync, renameSync } from "node:fs";
+import path from "node:path";
+
+const siteDir = path.resolve(process.cwd(), "public/site");
+const source = path.join(siteDir, "site.html");
+const target = path.join(siteDir, "index.html");
+
+if (existsSync(source)) {
+  renameSync(source, target);
+}

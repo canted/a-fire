@@ -1,0 +1,29 @@
+# syntax = docker/dockerfile:1
+
+ARG NODE_IMAGE=node:24-bookworm-slim@sha256:3638d9a6fe4030bd716be989438248074489337ba3275657f93595428be4fc03
+
+FROM ${NODE_IMAGE} AS build
+WORKDIR /app
+
+RUN corepack enable
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN corepack install && pnpm install --frozen-lockfile
+
+COPY . .
+
+RUN pnpm prisma:generate && pnpm build && pnpm prune --prod
+
+FROM ${NODE_IMAGE} AS runtime
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+COPY --from=build /app/node_modules /app/node_modules
+COPY --from=build /app/dist /app/dist
+COPY --from=build /app/public /app/public
+COPY --from=build /app/server/prisma /app/server/prisma
+COPY package.json ./
+
+EXPOSE 4000
+CMD ["node", "dist/server/main.js"]

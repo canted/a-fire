@@ -1,0 +1,13 @@
+appId: co.canted.afire.preview.localhttps
+---
+- openLink: afire-local-https://app/rooms/2856/chat
+- extendedWaitUntil:
+    visible: Message Expo rich content.*
+    timeout: 20000
+- tapOn: Open Side Rooms shelf
+- tapOn: Enter Expo carry target
+- assertVisible: Message Expo carry target.*
+- tapOn: Step out to parent Room
+- assertVisible: Message Expo rich content.*
+- assertNotVisible: Step out to parent Room
+- takeScreenshot: parent-room-return

@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+VITE_BUILD_TARGET=site pnpm exec vite build "$@"
+exec "$PWD/bin/rename-site-html"

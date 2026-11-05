@@ -1,0 +1,58 @@
+appId: co.canted.afire.preview.localhttps
+---
+- stopApp
+- openLink: afire-local-https://app/rooms/2856/chat
+- extendedWaitUntil:
+    visible: Message Expo rich content.*
+    timeout: 30000
+- tapOn: Open Room details
+- tapOn: Start a side chat
+- assertVisible: Cancel selection
+- assertVisible: Create side chat
+- waitForAnimationToEnd
+- takeScreenshot: side-selection-controls
+- tapOn: Cancel selection
+- tapOn:
+    text: Close Room details
+    index: 0
+- openLink: afire-local-https://app/rooms/2856/chat/messages/8177
+- assertVisible: Back to Chat
+- waitForAnimationToEnd
+- takeScreenshot: thread-controls
+- tapOn: Back to Chat
+- openLink: afire-local-https://app/rooms/2856/chat/messages/8177/save
+- extendedWaitUntil:
+    visible: Chat parity destination
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: save-controls
+- tapOn: Cancel
+- openLink: afire-local-https://app/rooms/2856/notes
+- extendedWaitUntil:
+    visible: Synthetic control parity
+    timeout: 20000
+- waitForAnimationToEnd
+- takeScreenshot: notes-controls
+- tapOn: Note actions for Synthetic control parity
+- assertVisible: Delete this note
+- tapOn: Cancel
+- tapOn: Synthetic control parity
+- extendedWaitUntil:
+    visible: More tools
+    timeout: 30000
+- tapOn: Attach
+- assertVisible: Attach file
+- assertVisible: Record audio
+- tapOn: Attach
+- waitForAnimationToEnd
+- takeScreenshot: editor-controls
+- tapOn: More tools
+- assertVisible: Heading 2
+- waitForAnimationToEnd
+- takeScreenshot: editor-expanded-controls
+- tapOn: Close Insert block
+- tapOn: Note actions
+- assertVisible: Save note
+- assertVisible: Share note link
+- tapOn: Close Note actions
+- assertVisible: More tools

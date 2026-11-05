@@ -1,0 +1,375 @@
+#!/usr/bin/env node
+
+import process from "node:process";
+import { setTimeout as delay } from "node:timers/promises";
+import { spawn } from "node:child_process";
+import { createServer } from "node:net";
+import { resolveTestEnvironment } from "../server/runtime/test-environment.mjs";
+
+const startupTimeoutMs = 60_000;
+const shutdownGracePeriodMs = 5_000;
+const pollingIntervalMs = 500;
+const probeTimeoutMs = 1_000;
+const testFrontendPort = readPort("TEST_FRONTEND_PORT", 5174);
+const requestedTestApiOrigin = process.env.TEST_API_ORIGIN;
+const testApiPort = readPort("TEST_API_PORT", portFromUrl(requestedTestApiOrigin) ?? 4100);
+const testApiOrigin = requestedTestApiOrigin ?? `http://127.0.0.1:${testApiPort}`;
+const readyUrl = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${testFrontendPort}`;
+const backendHealthUrl = process.env.PLAYWRIGHT_API_HEALTH_URL ?? `${testApiOrigin}/api/v1/health`;
+const requiredPorts = uniquePorts([
+  testFrontendPort,
+  testApiPort,
+  portFromUrl(readyUrl),
+  portFromUrl(backendHealthUrl),
+]);
+const cliArgs = process.argv.slice(2);
+const playwrightOnly = cliArgs.includes("--playwright-only");
+const prepareOnly = cliArgs.includes("--prepare-only");
+const unknownArgs = cliArgs.filter((arg) => !["--playwright-only", "--prepare-only"].includes(arg));
+
+if (unknownArgs.length > 0) {
+  console.error(`Unknown option${unknownArgs.length === 1 ? "" : "s"}: ${unknownArgs.join(", ")}`);
+  process.exit(1);
+}
+
+let activeForeground = null;
+let shutdownSignal = null;
+let isCleaningUpBackground = false;
+let testEnv = null;
+
+function readPort(name, fallback) {
+  const rawValue = process.env[name];
+  if (!rawValue) return fallback;
+
+  const port = Number(rawValue);
+  if (!Number.isInteger(port) || port <= 0 || port > 65535) {
+    throw new Error(`${name} must be a valid TCP port, received ${rawValue}`);
+  }
+  return port;
+}
+
+function portFromUrl(urlValue) {
+  try {
+    const url = new URL(urlValue);
+    if (url.port) return Number(url.port);
+    if (url.protocol === "http:") return 80;
+    if (url.protocol === "https:") return 443;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function uniquePorts(ports) {
+  return Array.from(new Set(ports.filter((port) => Number.isInteger(port) && port > 0 && port <= 65535)));
+}
+
+function databaseLabel(databaseUrl) {
+  try {
+    const url = new URL(databaseUrl);
+    const port = url.port ? `:${url.port}` : "";
+    return `${url.hostname}${port}${url.pathname}`;
+  } catch {
+    return "configured test database";
+  }
+}
+
+function buildTestEnv() {
+  return {
+    ...resolveTestEnvironment({ requireDatabase: true }),
+    API_PORT: String(testApiPort),
+    WEB_PORT: String(testFrontendPort),
+    EXPO_PUBLIC_API_URL: `${testApiOrigin}/api`,
+    VITE_API_DEV_ORIGIN: testApiOrigin,
+    VITE_API_PROXY_TARGET: testApiOrigin,
+    VITE_DEV_CONTEXT: "test",
+    VITE_DEV_SERVER_PORT: String(testFrontendPort),
+    VITE_HMR_HOST: process.env.VITE_HMR_HOST ?? "127.0.0.1",
+    VITE_HMR_PORT: String(testFrontendPort),
+    VITE_HOCUSPOCUS_URL: `${testApiOrigin}/hocuspocus`,
+    PLAYWRIGHT_BASE_URL: readyUrl,
+    PLAYWRIGHT_API_HEALTH_URL: backendHealthUrl,
+  };
+}
+
+function spawnCommand(command, args, options = {}) {
+  return spawn(command, args, {
+    stdio: "pipe",
+    shell: false,
+    detached: true,
+    ...options,
+  });
+}
+
+function shouldSuppressBackgroundLine(line) {
+  if (!isCleaningUpBackground) return false;
+  if (!line.includes("ELIFECYCLE")) return false;
+  return line.includes("Command failed.") || line.includes("exit code 143");
+}
+
+function pipeBackgroundStream(stream, output) {
+  if (!stream) return;
+
+  let buffer = "";
+
+  stream.on("data", (chunk) => {
+    buffer += chunk.toString();
+    const lines = buffer.split(/\r?\n/);
+    buffer = lines.pop() ?? "";
+
+    for (const line of lines) {
+      if (shouldSuppressBackgroundLine(line)) continue;
+      output.write(`${line}\n`);
+    }
+  });
+
+  stream.on("end", () => {
+    if (!buffer.length || shouldSuppressBackgroundLine(buffer)) return;
+    output.write(buffer);
+  });
+}
+
+function attachBackgroundOutput(child) {
+  pipeBackgroundStream(child.stdout, process.stdout);
+  pipeBackgroundStream(child.stderr, process.stderr);
+}
+
+function watchBackground(command, child) {
+  const status = {
+    ready: false,
+    error: null,
+  };
+
+  child.on("error", (error) => {
+    status.error = new Error(`Failed to start ${command}: ${error.message}`);
+  });
+
+  child.on("exit", (code, signal) => {
+    const details = signal ? `signal ${signal}` : `code ${code ?? 1}`;
+    const phase = status.ready ? "exited unexpectedly" : "exited before the app was ready";
+    status.error ??= new Error(`${command} ${phase} (${details})`);
+  });
+
+  return status;
+}
+
+async function isPortAvailable(port) {
+  return new Promise((resolve) => {
+    const server = createServer();
+
+    server.unref();
+    server.once("error", () => resolve(false));
+    server.listen({ host: "127.0.0.1", port }, () => {
+      server.close(() => resolve(true));
+    });
+  });
+}
+
+async function assertRequiredPortsAvailable(ports) {
+  const blockedPorts = [];
+
+  for (const port of ports) {
+    // `pnpm test` owns the app lifecycle, so stale listeners are a hard failure.
+    if (!(await isPortAvailable(port))) blockedPorts.push(port);
+  }
+
+  if (blockedPorts.length === 0) return;
+
+  const portLabel = blockedPorts.length === 1 ? "port" : "ports";
+  const verb = blockedPorts.length === 1 ? "is" : "are";
+  throw new Error(
+    `Cannot start the test stack because ${portLabel} ${blockedPorts.join(", ")} ${verb} already in use. Stop the existing process and rerun pnpm test.`,
+  );
+}
+
+async function isServerReady(url) {
+  try {
+    const response = await fetch(url, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(probeTimeoutMs),
+    });
+    return response.status < 500;
+  } catch {
+    return false;
+  }
+}
+
+async function isBackendReady(url) {
+  try {
+    const response = await fetch(url, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(probeTimeoutMs),
+    });
+    if (!response.ok) return false;
+
+    const payload = await response.json().catch(() => null);
+    return payload?.db === "ok";
+  } catch {
+    return false;
+  }
+}
+
+async function waitForStack(url, healthUrl, timeoutMs, backgroundStatus) {
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    if (backgroundStatus.error) throw backgroundStatus.error;
+    if ((await isServerReady(url)) && (await isBackendReady(healthUrl))) {
+      backgroundStatus.ready = true;
+      return;
+    }
+    if (backgroundStatus.error) throw backgroundStatus.error;
+    await delay(pollingIntervalMs);
+  }
+
+  throw new Error(`Timed out waiting for app stack readiness at ${url} and ${healthUrl} after ${timeoutMs}ms`);
+}
+
+async function terminateProcessTree(child) {
+  if (!child?.pid) return;
+  if (child.exitCode !== null || child.signalCode !== null) return;
+
+  isCleaningUpBackground = true;
+
+  try {
+    process.kill(-child.pid, "SIGTERM");
+  } catch (error) {
+    if (error?.code === "ESRCH") return;
+    throw error;
+  }
+
+  const deadline = Date.now() + shutdownGracePeriodMs;
+
+  while (child.exitCode === null && child.signalCode === null && Date.now() < deadline) {
+    await delay(100);
+  }
+
+  if (child.exitCode !== null || child.signalCode !== null) return;
+
+  try {
+    process.kill(-child.pid, "SIGKILL");
+  } catch (error) {
+    if (error?.code === "ESRCH") return;
+    throw error;
+  }
+}
+
+function runForeground(command, args, options = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      stdio: "inherit",
+      shell: false,
+      ...options,
+    });
+
+    activeForeground = child;
+
+    const clearActiveForeground = () => {
+      if (activeForeground === child) activeForeground = null;
+    };
+
+    child.on("error", (error) => {
+      clearActiveForeground();
+      reject(error);
+    });
+
+    child.on("exit", (code, signal) => {
+      clearActiveForeground();
+
+      if (signal) {
+        reject(new Error(`${command} exited with signal ${signal}`));
+        return;
+      }
+
+      resolve(code ?? 1);
+    });
+  });
+}
+
+function signalToExitCode(signal) {
+  if (signal === "SIGINT") return 130;
+  if (signal === "SIGTERM") return 143;
+  return 1;
+}
+
+let background = null;
+
+const handleSigInt = () => {
+  shutdownSignal ??= "SIGINT";
+  if (activeForeground?.pid && activeForeground.exitCode === null && activeForeground.signalCode === null) {
+    try {
+      activeForeground.kill("SIGINT");
+    } catch {
+      // The child may have already exited between the status check and kill.
+    }
+  }
+  void terminateProcessTree(background).catch(() => {});
+};
+
+const handleSigTerm = () => {
+  shutdownSignal ??= "SIGTERM";
+  if (activeForeground?.pid && activeForeground.exitCode === null && activeForeground.signalCode === null) {
+    try {
+      activeForeground.kill("SIGTERM");
+    } catch {
+      // The child may have already exited between the status check and kill.
+    }
+  }
+  void terminateProcessTree(background).catch(() => {});
+};
+
+process.on("SIGINT", handleSigInt);
+process.on("SIGTERM", handleSigTerm);
+
+let exitCode = 0;
+
+try {
+  testEnv = buildTestEnv();
+  if (prepareOnly) {
+    exitCode = await runForeground("pnpm", ["db:prepare"], { env: testEnv });
+  } else {
+    if (playwrightOnly) {
+      process.stdout.write("Skipping Vitest; running Playwright only.\n");
+    } else {
+      const vitestCode = await runForeground("pnpm", ["vitest"], { env: testEnv });
+      if (vitestCode !== 0) {
+        exitCode = vitestCode;
+      }
+    }
+
+    if (exitCode !== 0) throw new Error("Vitest failed; browser tests were not started.");
+
+    await assertRequiredPortsAvailable(requiredPorts);
+
+    process.stdout.write(
+      `Starting test stack on ${readyUrl} with API ${testApiOrigin} and database ${databaseLabel(testEnv.DATABASE_URL)}\n`,
+    );
+
+    background = spawnCommand("pnpm", ["dev"], {
+      env: testEnv,
+    });
+    attachBackgroundOutput(background);
+    const backgroundStatus = watchBackground("pnpm dev", background);
+
+    await waitForStack(readyUrl, backendHealthUrl, startupTimeoutMs, backgroundStatus);
+
+
+    if (exitCode === 0) {
+      if (backgroundStatus.error) throw backgroundStatus.error;
+      const playwrightCode = await runForeground("pnpm", ["playwright"], { env: testEnv });
+      exitCode = playwrightCode;
+    }
+  }
+} catch (error) {
+  if (!shutdownSignal) {
+    console.error(error instanceof Error ? error.message : error);
+  }
+  exitCode = signalToExitCode(shutdownSignal);
+  if (!shutdownSignal) exitCode = 1;
+} finally {
+  process.off("SIGINT", handleSigInt);
+  process.off("SIGTERM", handleSigTerm);
+  await terminateProcessTree(background);
+}
+
+process.exit(exitCode);

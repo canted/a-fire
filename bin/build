@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e
+
+cd "$(dirname "$0")/.."
+
+"$PWD/bin/build:app"
+"$PWD/bin/build:api"
