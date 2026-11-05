@@ -72,7 +72,7 @@
     "@nestjs/core": "^11.1.28",
     "@nestjs/platform-express": "^11.1.28",
     "@nestjs/platform-socket.io": "^11.1.28",
-    "@nestjs/websockets": "^11.1.28",
+    "@nestjs/websockets": "^11.2.8",
     "@posthog/react": "^1.10.3",
     "@prisma/client": "^6.5.0",
     "@tiptap/core": "^3.30.5",
